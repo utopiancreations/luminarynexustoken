@@ -47,6 +47,48 @@ We leverage a robust stack including:
 * **AI:** On-site AI Core & Incubation Chamber, exploring technologies like Cortical Labs. [cite: 146, 150]
 * **Infrastructure:** Sustainable energy, IoT, and community application. [cite: 153, 158]
 
+## Development Environment Setup (Ubuntu)
+
+For developers looking to contribute to the Luminary Nexus Token contracts or related software, this guide helps set up a consistent development environment on Ubuntu.
+
+1.  **Clone the Repository:**
+    If you haven't already, clone the project repository to your local machine:
+    ```bash
+    git clone <repository_url>
+    cd luminary-nexus-token # Or your repository directory name
+    ```
+
+2.  **Run the Setup Script:**
+    The project includes a setup script to install necessary tools (like Node.js, Hardhat dependencies) and configure the project.
+    Make sure you are in the root directory of the cloned repository, then run:
+    ```bash
+    bash scripts/ubuntu-setup.sh
+    ```
+    The script will guide you through the process and:
+    *   Update your system's package list.
+    *   Install required system packages (e.g., `curl`, `git`, `build-essential`, `jq`).
+    *   Ensure you have Node.js (version 18+).
+    *   Set up the `package.json` with correct dependencies and scripts.
+    *   Install npm dependencies.
+    *   Create a `.env` file from `.env.example` (you will need to fill in your API keys and private key).
+    *   Ensure `hardhat.config.js` is configured (or provide guidance if you have an existing one).
+    *   Create standard project directories if they don't exist.
+    *   Attempt to compile contracts and run tests to verify the setup.
+
+3.  **Configure Environment Variables:**
+    After the script runs, you **must** edit the newly created `.env` file:
+    ```bash
+    nano .env
+    ```
+    Fill in your `AMOY_RPC_URL` (or `ALCHEMY_API_KEY`), `POLYGON_RPC_URL`, `PRIVATE_KEY`, `POLYGONSCAN_API_KEY`, and `TREASURY_ADDRESS`. Refer to comments in the `.env` file for details on where to obtain these.
+
+4.  **Ready to Develop:**
+    Once the setup script is complete and your `.env` file is configured, you should be ready to:
+    *   Compile contracts: `npm run compile`
+    *   Run tests: `npm run test`
+    *   Deploy contracts (e.g., to Amoy): `npm run deploy:amoy`
+    *   And other tasks defined in `package.json` scripts.
+
 ## Project Status
 
 We are currently in the **Blueprint & Foundation Phase** (Est. 6-12 months), focusing on design finalization, contract development/audits, and initial community building. [cite: 161] Physical construction and full DAO activation are planned for later phases, contingent on Community Treasury milestones. [cite: 164, 166]
