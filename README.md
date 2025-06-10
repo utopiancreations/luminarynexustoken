@@ -83,7 +83,7 @@ We are currently in the **Blueprint & Foundation Phase** (Est. 6-12 months), foc
 We believe this future requires collective effort.
 
 * **Explore the Code:** Dive into our [GitHub Repository](https://github.com/UtopianCreations/LuminaryNexusToken) (Note: Link is a placeholder).
-* **Read the Full Vision:** [LuminaryNexusWhitepaper.pdf](LuminaryNexusWhitepaper.pdf)
+* **Read the Full Vision:** [Current White Paper](https://utopiancreations.github.io/luminarynexustoken/)
 * **Join the Conversation:**
     * Discord: <https://discord.com/invite/5fB5ScqgZB>
     * Telegram: <https://t.me/+WLV3Xb9oTcE1NTUx>
