@@ -87,5 +87,5 @@ We believe this future requires collective effort.
 * **Join the Conversation:**
     * Discord: <https://discord.com/invite/5fB5ScqgZB>
     * Telegram: <https://t.me/+WLV3Xb9oTcE1NTUx>
-* **Apply to Join:** Fill out our Values Questionnaire: <https://utopiancreations.github.io/LuminaryNexusToken/questionnaire.html
+* **Apply to Join:** Fill out our Values Questionnaire: <https://utopiancreations.github.io/luminarynexustoken/questionnaire.html>
 * **Contribute to the Team:** Email LNX@utopiancreations.one
