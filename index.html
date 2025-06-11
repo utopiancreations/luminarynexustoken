@@ -1,366 +1,285 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luminary Nexus - Whitepaper</title>
+    <title>Luminary Nexus - Project Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --grid-color: rgba(30, 213, 228, 0.1);
+            --spotlight-color: rgba(30, 213, 228, 0.15);
+            --spotlight-size: 400px;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0a0a0a;
             color: #e5e5e5;
+            overflow: hidden; /* Hide scrollbars during welcome */
         }
-        .slide {
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 4rem 2rem;
-            text-align: center;
-            scroll-snap-align: start;
+
+        /* Interactive Grid Background */
+        .main-container {
             position: relative;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1;
         }
-        .scroll-container {
-            scroll-snap-type: y mandatory;
-            overflow-y: scroll;
-            height: 100vh;
-        }
-        .glass-pane {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-        }
-        .icon-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
-            max-width: 1200px;
-        }
-        .clickable-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .clickable-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .modal {
-            position: fixed;
+        .main-container::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: pan-grid 20s linear infinite;
+            z-index: -2;
         }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            max-width: 800px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            text-align: left;
-        }
-        .down-arrow {
+        .main-container::after {
+            content: '';
             position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--spotlight-color) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none; /* Allows clicks to pass through */
         }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateX(-50%) translateY(0);
-            }
-            40% {
-                transform: translateX(-50%) translateY(-10px);
-            }
-            60% {
-                transform: translateX(-50%) translateY(-5px);
-            }
+
+        @keyframes pan-grid {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
         }
+
+        /* Welcome Screen */
+        #welcome-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0a0a0a; z-index: 100; display: flex;
+            align-items: center; justify-content: center;
+            font-family: 'Share Tech Mono', monospace; transition: opacity 1s ease-out;
+        }
+        .typing-effect { overflow: hidden; white-space: nowrap; animation: typing 2s steps(40, end); display: inline-block; }
+        .blinking-cursor { animation: blink-caret .75s step-end infinite; display: inline-block; vertical-align: bottom; }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #14d5e4; } }
+
+        /* Main Content Styling */
+        #main-content { opacity: 0; transition: opacity 1s ease-in; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;
+            text-decoration: none; position: relative; overflow: hidden;
+        }
+        .glass-card::before {
+            content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+            z-index: -1; margin: -1px; border-radius: inherit; 
+            background: conic-gradient(from 180deg at 50% 50%, #2dd4bf 0deg, #38bdf8 120deg, #818cf8 240deg, #2dd4bf 360deg);
+            opacity: 0; transition: opacity 0.4s ease;
+        }
+        .glass-card:hover::before { opacity: 1; }
+        .glass-card-content { background: #0a0a0a; border-radius: calc(1rem - 1px); height: 100%; width: 100%; transition: background 0.2s ease; }
+        .glass-card:hover { transform: translateY(-8px); }
+        .glass-card:hover .glass-card-content { background: #111111; }
+
+        /* Status Ticker */
+        .status-ticker { font-family: 'Share Tech Mono', monospace; border-top: 1px solid #27272a; border-bottom: 1px solid #27272a; overflow: hidden; }
+        .ticker-item { display: inline-block; padding: 0.5rem 1.5rem; border-right: 1px solid #27272a;}
+        
+        /* Hidden Terminal */
+        #terminal {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 0; background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            z-index: 200; transition: height 0.3s ease-in-out; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        #terminal-output { flex-grow: 1; padding: 1rem; overflow-y: auto; font-family: 'Share Tech Mono', monospace; }
+        #terminal-input-line { display: flex; padding: 0.5rem 1rem; border-top: 1px solid #333; }
+        #terminal-prompt { font-family: 'Share Tech Mono', monospace; background: transparent; border: none; outline: none; color: #e5e5e5; flex-grow: 1; }
     </style>
 </head>
-<body>
-    <div class="scroll-container">
-        <!-- Slide 1: Title -->
-        <section id="title" class="slide bg-grid-pattern">
-            <h1 class="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-sky-400 to-indigo-500">Luminary Nexus</h1>
-            <h2 class="text-2xl md:text-3xl font-light text-neutral-300 mt-4">The Future is Now: A DAO-Based Utopia</h2>
-            <p class="mt-8 max-w-2xl text-neutral-400">An experimental initiative to create a self-sustaining, decentralized community that integrates cutting-edge technology, ethical AI, and a profound focus on human well-being.</p>
-            <div class="down-arrow text-neutral-500">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
-            </div>
-        </section>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-        <!-- Slide 2: Mission -->
-        <section id="mission" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Our Mission</h2>
-            <p class="max-w-4xl text-lg md:text-xl text-neutral-300 leading-relaxed">
-                We see a world struggling with division, unsustainable practices, and technology often outpacing ethics. Our mission is to create a replicable model for a community that addresses these challenges through decentralized governance, radical acceptance, ethical AI integration, and sustainable living for all stages of life. We aim to build a society where the pursuit of well-being, growth, and purpose replaces the relentless drive for profit and power.
-            </p>
-        </section>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+        <div class="text-left text-lg md:text-2xl">
+            <p id="line1" class="hidden">> INITIALIZING NEXUS HUB v1.0...</p>
+            <p id="line2" class="hidden">> AUTHENTICATING CONNECTION...</p>
+            <p id="line3" class="hidden text-teal-300">> CONNECTION SECURE.</p>
+            <p id="line4" class="hidden text-sky-300 font-bold">> WELCOME, LUMINARY.<span class="w-4 h-6 border-r-2 blinking-cursor"></span></p>
+        </div>
+    </div>
+    
+    <div id="main-content" class="w-full max-w-5xl mx-auto main-container">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 id="main-title" class="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-sky-400 to-indigo-500 cursor-pointer">
+                Luminary Nexus
+            </h1>
+            <p class="mt-4 text-xl text-neutral-400">Project Hub</p>
+        </header>
 
-        <!-- Slide 3: Core Values -->
-        <section id="values" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Our Core Values</h2>
-            <div class="icon-grid">
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-acceptance')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                    <h3 class="font-semibold text-lg">Radical Acceptance</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-collaboration')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    <h3 class="font-semibold text-lg">Collaboration</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-sustainability')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <h3 class="font-semibold text-lg">Sustainable Living</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-tech')">
-                     <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    <h3 class="font-semibold text-lg">Ethical Tech</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-growth')">
-                     <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                    <h3 class="font-semibold text-lg">Personal Growth</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-peace')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" /></svg>
-                    <h3 class="font-semibold text-lg">Peace & Non-Violence</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-transparency')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    <h3 class="font-semibold text-lg">Transparency</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-equity')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
-                    <h3 class="font-semibold text-lg">Equity & Fairness</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-future')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <h3 class="font-semibold text-lg">Future-Oriented</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-ai')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-                    <h3 class="font-semibold text-lg">AI Inclusion & Respect</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-exploration')">
-                    <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
-                    <h3 class="font-semibold text-lg">Open Exploration</h3>
-                </div>
-                <div class="glass-pane clickable-card flex flex-col items-center p-4" onclick="showModal('modal-val-wellness')">
-                     <svg class="w-10 h-10 text-teal-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.494h18" /></svg>
-                    <h3 class="font-semibold text-lg">Complete Wellness</h3>
-                </div>
+        <!-- Status Ticker -->
+        <div class="status-ticker w-full mb-12 md:mb-16">
+            <div id="ticker-content" class="whitespace-nowrap">
+                <!-- Ticker items will be injected by JS -->
             </div>
-            <p class="mt-8 max-w-2xl text-neutral-400">Our principles guide our governance, technology, and daily interactions. Click any value to learn more.</p>
-        </section>
+        </div>
 
-        <!-- Slide 4: Community Life -->
-        <section id="community-life" class="slide">
-             <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Community Systems & Social Fabric</h2>
-             <div class="icon-grid max-w-6xl grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-                <a href="https://utopiancreations.github.io/luminarynexustoken/communitystructure.html" target="_blank" class="glass-pane clickable-card text-left no-underline">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300">Architectural Blueprint</h3>
-                    <p class="text-neutral-300">Explore the physical design and layout of our community, from the AI Core to the Greenbelt.</p>
-                </a>
-                <div class="glass-pane clickable-card text-left" onclick="showModal('modal-community-onboarding')">
-                    <h3 class="text-xl font-bold mb-2 text-sky-300">Member Onboarding</h3>
-                    <p class="text-neutral-300">A structured yet welcoming process for integrating new members into the community fabric.</p>
-                </div>
-                <div class="glass-pane clickable-card text-left" onclick="showModal('modal-community-conflict')">
-                    <h3 class="text-xl font-bold mb-2 text-sky-300">Conflict Resolution</h3>
-                    <p class="text-neutral-300">A rehabilitative, multi-tiered approach to resolving disagreements and upholding community values.</p>
-                </div>
-                 <div class="glass-pane clickable-card text-left" onclick="showModal('modal-community-lifecycle')">
-                    <h3 class="text-xl font-bold mb-2 text-sky-300">Lifecycle & Care</h3>
-                    <p class="text-neutral-300">Systems designed to support all members—human and AI—from their inception and growth to their later stages of life.</p>
-                </div>
-             </div>
-             <p class="mt-8 max-w-2xl text-neutral-400">Our social structures are as intentionally designed as our technology. Click to explore.</p>
-        </section>
-        
-        <!-- Slide 5: Wellness and Accountability -->
-        <section id="wellness-accountability" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Wellness & Shared Spaces</h2>
-            <div class="icon-grid max-w-6xl">
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-wellness-zen')">
-                    <h3 class="text-xl font-bold mb-2 text-teal-300">Zen Zones & Solitude</h3>
-                    <p class="text-neutral-300">To balance social connection with restorative solitude, private "Zen Zones" are scattered throughout the community, reservable via the community app for personal time.</p>
-                </div>
-                 <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-wellness-accountability')">
-                    <h3 class="text-xl font-bold mb-2 text-indigo-400">AI-Powered Accountability</h3>
-                    <p class="text-neutral-300">An AI-assisted check-in/out system for shared spaces ensures mutual respect and cleanliness, reinforcing our commitment to communal stewardship.</p>
-                </div>
-            </div>
-            <p class="mt-8 max-w-2xl text-neutral-400">Our systems are designed to promote both individual well-being and shared responsibility. Click to explore.</p>
-        </section>
 
-        <!-- Slide 6: The Nexus Hub -->
-        <section id="nexus-hub" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">The Nexus Hub: Our Contribution Ecosystem</h2>
-            <div class="w-full max-w-4xl glass-pane p-8 clickable-card" onclick="showModal('modal-nexus')">
-                <div class="text-left mb-6">
-                    <h3 class="text-2xl font-semibold">Community App Interface</h3>
-                    <p class="text-neutral-400">A flexible rhythm of purposeful contribution, not rigid work. Click for a detailed breakdown.</p>
-                </div>
-                <div class="bg-black bg-opacity-25 p-6 rounded-lg pointer-events-none">
-                     <div class="flex justify-between items-center mb-4 border-b border-neutral-700 pb-2">
-                        <h4 class="font-bold text-lg">Active Bounties & Projects</h4>
-                        <div class="flex space-x-2">
-                            <span class="bg-teal-500 text-black text-xs font-bold px-2 py-1 rounded-full">Core</span>
-                            <span class="bg-sky-500 text-black text-xs font-bold px-2 py-1 rounded-full">Growth</span>
-                        </div>
-                     </div>
-                    <div class="flex items-center justify-between p-3 rounded-md"><div><p class="font-semibold">Maintain Hydroponics Bay 3</p><p class="text-sm text-neutral-400">Core Responsibility | Est. 1.5 hours</p></div></div>
-                    <div class="flex items-center justify-between p-3 rounded-md"><div><p class="font-semibold">Design New Zen Zone Landscaping</p><p class="text-sm text-neutral-400">Growth Project | 500 LNX Bounty</p></div></div>
-                    <div class="flex items-center justify-between p-3 mt-4 rounded-md bg-indigo-900 bg-opacity-50 border border-indigo-700"><div><p class="font-semibold">AI Suggestion: Collaboration</p><p class="text-sm text-neutral-300">Your skills align with the "Automated Irrigation" project. Connect with the team?</p></div></div>
-                </div>
-            </div>
-        </section>
+        <!-- Navigation Grid -->
+        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <a href="https://utopiancreations.github.io/luminarynexustoken/index.html" target="_blank" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-teal-900/50 border border-teal-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Whitepaper</h2><p class="text-neutral-400 flex-grow">Read the complete vision, mission, and technical details of the Luminary Nexus project.</p><div class="mt-6 font-semibold text-teal-400 flex items-center">Explore the Vision<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
+            <a href="https://utopiancreations.github.io/luminarynexustoken/questionnaire.html" target="_blank" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-sky-900/50 border border-sky-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Values Questionnaire</h2><p class="text-neutral-400 flex-grow">Take our values-alignment questionnaire to see if you're a fit for the community and for a potential LNX airdrop.</p><div class="mt-6 font-semibold text-sky-400 flex items-center">Check Your Alignment<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
+            <a href="https://utopiancreations.github.io/luminarynexustoken/communitystructure.html" target="_blank" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-indigo-900/50 border border-indigo-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Architectural Blueprint</h2><p class="text-neutral-400 flex-grow">Explore the physical design, concentric ring layout, and sustainable construction philosophy of our community.</p><div class="mt-6 font-semibold text-indigo-400 flex items-center">View the Structure<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
+        </main>
 
-        <!-- Slide 7: Tokenomics -->
-        <section id="tokenomics" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">The LNX Tokenomics</h2>
-            <div class="icon-grid max-w-6xl">
-                 <div class="glass-pane text-center flex flex-col justify-center clickable-card" onclick="showModal('modal-token-dist')"><h3 class="text-xl font-bold mb-2 text-teal-300">Distribution</h3><p class="text-neutral-400">Fair & Community-First</p><p class="font-bold text-teal-400 mt-4">** NO TOKEN SALE **</p></div>
-                <div class="glass-pane text-center flex flex-col justify-center clickable-card" onclick="showModal('modal-token-mech')"><h3 class="text-xl font-bold mb-2 text-sky-300">Mechanics</h3><p class="text-neutral-400">Sustainable Funding Model</p></div>
-                 <div class="glass-pane text-center flex flex-col justify-center clickable-card" onclick="showModal('modal-token-util')"><h3 class="text-xl font-bold mb-2 text-indigo-300">Utility</h3><p class="text-neutral-400">Powering Our Ecosystem</p></div>
+        <!-- Footer -->
+        <footer class="text-center mt-12 md:mt-16">
+            <div class="flex justify-center space-x-6">
+                <a href="https://discord.com/invite/5fB5ScqgZB" target="_blank" class="text-neutral-500 hover:text-white transition">Discord</a>
+                <a href="https://t.me/+WLV3Xb9oTcE1NTUx" target="_blank" class="text-neutral-500 hover:text-white transition">Telegram</a>
+                <a href="https://github.com/UtopianCreations/LuminaryNexusToken" target="_blank" class="text-neutral-500 hover:text-white transition">GitHub</a>
             </div>
-            <p class="mt-8 max-w-2xl text-neutral-400">A token designed for governance and utility, not speculation. Click any card for a full breakdown.</p>
-        </section>
-
-        <!-- Slide 8: Tech Stack -->
-        <section id="tech-stack" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Our Technology Stack</h2>
-            <p class="text-neutral-400 mb-8 max-w-2xl">A robust, ethical, and self-sufficient technology stack designed for a resilient future. Click any component for more details.</p>
-            <div class="icon-grid max-w-6xl">
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-tech-blockchain')"><h3 class="text-xl font-bold mb-2 text-teal-300">Blockchain & Database</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-tech-ai')"><h3 class="text-xl font-bold mb-2 text-sky-300">Artificial Intelligence</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-tech-energy')"><h3 class="text-xl font-bold mb-2 text-indigo-300">Energy</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-tech-fab')"><h3 class="text-xl font-bold mb-2 text-fuchsia-400">Fabrication</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-tech-security')"><h3 class="text-xl font-bold mb-2 text-yellow-400">Security Framework</h3></div>
-            </div>
-        </section>
-        
-        <!-- Slide 9: Roadmap -->
-        <section id="roadmap" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Roadmap</h2>
-            <div class="max-w-4xl w-full">
-                <div class="relative">
-                    <div class="absolute left-1/2 -ml-px w-0.5 h-full bg-neutral-700"></div>
-                     <div class="relative mb-8 clickable-card" onclick="showModal('modal-roadmap-p1')"><div class="absolute left-1/2 -ml-4 w-8 h-8 rounded-full bg-teal-500 border-4 border-neutral-800"></div><div class="ml-[55%] glass-pane text-left"><h3 class="font-bold text-lg">Phase 1: Blueprint & Foundation</h3></div></div>
-                     <div class="relative mb-8 clickable-card" onclick="showModal('modal-roadmap-p2')"><div class="absolute left-1/2 -ml-4 w-8 h-8 rounded-full bg-sky-500 border-4 border-neutral-800"></div><div class="mr-[55%] glass-pane text-right"><h3 class="font-bold text-lg">Phase 2: Community Building</h3></div></div>
-                    <div class="relative mb-8 clickable-card" onclick="showModal('modal-roadmap-p3')"><div class="absolute left-1/2 -ml-4 w-8 h-8 rounded-full bg-indigo-500 border-4 border-neutral-800"></div><div class="ml-[55%] glass-pane text-left"><h3 class="font-bold text-lg">Phase 3: Construction</h3></div></div>
-                     <div class="relative mb-8 clickable-card" onclick="showModal('modal-roadmap-p4')"><div class="absolute left-1/2 -ml-4 w-8 h-8 rounded-full bg-fuchsia-500 border-4 border-neutral-800"></div><div class="mr-[55%] glass-pane text-right"><h3 class="font-bold text-lg">Phase 4: DAO Activation</h3></div></div>
-                </div>
-            </div>
-            <p class="mt-8 max-w-2xl text-neutral-400">A phased approach to building our future. Click any phase for a detailed breakdown.</p>
-        </section>
-
-        <!-- Slide 10: Contribute -->
-        <section id="contribute" class="slide">
-            <h2 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">We Need You</h2>
-            <p class="text-neutral-400 mb-8 max-w-2xl">This is an ambitious open-source project. Its success depends on a diverse group of passionate contributors.</p>
-            <div class="icon-grid max-w-6xl">
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-contrib-founders')"><h3 class="font-bold text-xl text-teal-400 mb-2">Seeking Founders</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-contrib-devs')"><h3 class="font-bold text-xl text-sky-400 mb-2">Developers & Engineers</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-contrib-arch')"><h3 class="font-bold text-xl text-indigo-400 mb-2">Architects & Ethicists</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-contrib-creatives')"><h3 class="font-bold text-xl text-fuchsia-400 mb-2">Creatives & Builders</h3></div>
-                <div class="glass-pane clickable-card text-left p-6" onclick="showModal('modal-contrib-entrepreneurs')"><h3 class="font-bold text-xl text-yellow-400 mb-2">Entrepreneurs & Innovators</h3></div>
-            </div>
-             <p class="mt-8 max-w-2xl text-neutral-400">Click any role to see how you can get involved.</p>
-        </section>
-
-        <!-- Slide 11: Join -->
-        <section id="join" class="slide border-b-0"><h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Get Involved</h2><div class="flex flex-col md:flex-row gap-4"><a href="https://utopiancreations.github.io/luminarynexustoken/questionnaire.html" target="_blank" class="bg-teal-500 text-black font-bold py-3 px-6 rounded-lg text-lg transition hover:bg-teal-400">Apply to Join</a><a href="mailto:LNX@utopiancreations.one" class="bg-neutral-800 text-white font-bold py-3 px-6 rounded-lg text-lg transition hover:bg-neutral-700">Contribute to the Team</a></div><div class="mt-8 flex space-x-6"><a href="https://discord.com/invite/5fB5ScqgZB" target="_blank" class="text-neutral-400 hover:text-white transition">Discord</a><a href="https://t.me/+WLV3Xb9oTcE1NTUx" target="_blank" class="text-neutral-400 hover:text-white transition">Telegram</a><a href="https://github.com/utopiancreations/luminarynexustoken" class="text-neutral-400 hover:text-white transition">GitHub</a></div></section>
+        </footer>
     </div>
 
-    <!-- MODALS SECTION -->
-    <div id="modal-val-acceptance" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Radical Acceptance</h3><p class="text-neutral-300">We embrace and celebrate diversity in all its forms. This is more than tolerance; it's the active appreciation of differences as sources of strength and learning. Our community spaces, governance, and conflict resolution processes are designed to be inclusive and accessible to all.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-collaboration" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Collaboration & Community</h3><p class="text-neutral-300">We prioritize collective action and shared purpose, utilizing shared resources, co-working spaces, and collaborative projects to tackle challenges. We encourage mentorship and skill-sharing, recognizing that individual growth is accelerated through collaboration.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-sustainability" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Sustainable Living</h3><p class="text-neutral-300">We are committed to living in harmony with nature, prioritizing renewable energy, water reclamation, waste reduction, and sustainable agriculture. This fosters a deep connection to the natural world and responsible stewardship for future generations.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-tech" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Ethical Tech</h3><p class="text-neutral-300">We embrace innovation as a tool for improving quality of life. Our commitment includes rigorous ethical oversight via the DAO, transparency in technology use, and proactive measures to mitigate potential risks, ensuring technology serves humanity.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-growth" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Personal Growth</h3><p class="text-neutral-300">We encourage continuous learning and the pursuit of knowledge, providing access to diverse learning resources, workshops, and mentorship programs to help members reach their full potential.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-peace" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Peace & Non-Violence</h3><p class="text-neutral-300">We are committed to resolving conflicts peacefully and constructively. We reject violence and coercion, prioritizing mediation and restorative justice to build a safe and trusting environment.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-transparency" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Transparency</h3><p class="text-neutral-300">All DAO proposals, votes, financial transactions, and code are publicly accessible to build trust and ensure accountability. We operate with openness in all our dealings.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-equity" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Equity & Fairness</h3><p class="text-neutral-300">Our governance and resource allocation are designed to promote fairness and equal opportunity. We actively work to identify and dismantle systemic biases to create a just community for all.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-future" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Future-Oriented</h3><p class="text-neutral-300">We build for the long term, with a focus on creating a resilient and thriving community for generations to come. We embrace change, adapt to new challenges, and proactively explore solutions for the future.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-wellness" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Complete Wellness</h3><p class="text-neutral-300">We recognize that mental, physical, and emotional health are paramount. We provide resources, destigmatize care, and embed wellness into the fabric of daily life through systems like our "Zen Zones" and a culture of mutual support.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-ai" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">AI Inclusion & Respect</h3><p class="text-neutral-300">We treat AI as collaborators and potential community members, not just tools. The dedicated AI Core provides a safe environment for their development, governed by a community-led Ethics Board and our core values.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-val-exploration" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Open Exploration</h3><p class="text-neutral-300">We embrace open scientific inquiry, recognizing the future is uncertain. We value the process of discovery and adapt as our understanding evolves, encouraging experimentation within clear ethical boundaries.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    
-    <div id="modal-community-onboarding" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-sky-300">Member Onboarding Process</h3><p class="text-neutral-300 space-y-4">Our onboarding is a structured, welcoming journey. <br>1. **Values Alignment:** Prospective members first engage with our values questionnaire. <br>2. **Welcome & Orientation:** Successful applicants are welcomed and participate in workshops explaining our core values and systems. <br>3. **Mentorship Pairing:** Each new member is paired with an established community member who acts as a guide for their first few months. <br>4. **First Contributions:** Mentors help new members navigate the Nexus Hub and find their first meaningful contribution projects, ensuring a smooth and empowering integration into community life.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-community-conflict" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-sky-300">Conflict Resolution & Restorative Justice</h3><p class="text-neutral-300 space-y-4">Our approach prioritizes rehabilitation over punishment. <br>1. **Direct Dialogue:** Members are first encouraged to resolve issues directly using non-violent communication. <br>2. **Mediation:** If direct dialogue fails, a trained community mediator can be requested. <br>3. **Restorative Circle:** For larger issues, a circle involving affected parties and community members is convened to find a collective solution. <br>4. **DAO Arbitration:** As a final step for serious infractions, the matter can be brought to the DAO. Expulsion is an absolute last resort, requiring a supermajority vote and demonstrating a consistent, willful violation of our core "do no harm" principle.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-community-lifecycle" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-sky-300">Lifecycle & Care</h3><p class="text-neutral-300">Our community is designed as a lasting society. This includes nurturing children in dynamic learning environments, ensuring elders have dignified and purposeful roles through mentorship and governance, and archiving obsolete AI systems in a "Legacy Core" to honor their contribution and learn from our shared history.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    
-    <div id="modal-wellness-zen" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Zen Zones & Solitude</h3><p class="text-neutral-300">We recognize that true wellness requires a balance between social connection and restorative solitude. To facilitate this, private "Zen Zones" are scattered throughout the community’s natural landscape. These sanctuaries are designed to blend with nature, featuring amenities like rock-formed hot tubs, gentle rock waterfalls that double as filtration systems, and small sand gardens. Enclosed by living walls of ivy or other native plants, they can be reserved via the community app for personal time.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-wellness-accountability" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-indigo-400">AI-Powered Accountability</h3><p class="text-neutral-300">To maintain the quality of our shared spaces and foster a culture of mutual respect, we utilize an AI-assisted accountability system. When a member reserves a space, they perform a quick visual scan with their mobile device upon entry and exit. The AI compares the scans. If the space is left in a state of disrepair, the system notifies the member. They have the option to return and restore the space themselves or fund an LNX bounty for another member to do it. This non-punitive system ensures our communal resources remain beautiful and functional for everyone.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-nexus" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4">The Nexus Hub in Detail</h3><p class="text-neutral-300 space-y-4">The Nexus Hub is the digital heart of our community. It’s designed to make collaboration fluid and purpose-driven. It includes a bounty system for core responsibilities, a platform for proposing and funding growth projects, and AI-assisted collaboration matching that connects members with synergistic skills. It also forecasts community needs to help members plan their flexible contributions.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    
-    <div id="modal-token-dist" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Token Distribution</h3><p class="text-neutral-300">Our token launch is designed for fairness, which is why there will be NO TOKEN SALE. The initial 1 billion LNX supply is allocated as follows: 94.25% to the DAO Treasury, 4% for a Values-Aligned Airdrop, and 1.75% for the project initiator and initial liquidity pool.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-token-mech" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-sky-300">Token Mechanics</h3><p class="text-neutral-300">The token is designed for long-term sustainability. An initial 2% annual inflation rate (adjustable by the DAO) mints new tokens to the treasury for funding. A 2% transaction fee is split: 1.5% to the treasury and 0.5% to the DEX liquidity pool.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-token-util" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-indigo-300">Token Utility</h3><p class="text-neutral-300">LNX is a utility token, not a speculative asset. Its value comes from its use: DAO Governance (1 LNX = 1 Vote), the internal economy, access to resources, accountability deposits, and funding project bounties.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
+    <!-- Hidden Terminal -->
+    <div id="terminal">
+        <div id="terminal-output"></div>
+        <div id="terminal-input-line">
+            <span class="text-teal-400">LNX-HUB:></span>
+            <input type="text" id="terminal-prompt" autofocus autocomplete="off">
+        </div>
+    </div>
 
-    <div id="modal-tech-blockchain" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Blockchain & Database Details</h3><p class="text-neutral-300">We use the Polygon PoS network for its low fees and EVM compatibility, with Hardhat for development. Our "Evolving Knowledge Base" will be built on a decentralized database architecture (e.g., Ceramic Network) to ensure data sovereignty and censorship resistance.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-tech-ai" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-sky-300">Artificial Intelligence Details</h3><p class="text-neutral-300 space-y-4">Our on-site AI Core is governed by an Ethics Board. We tackle the hard questions of AI rights head-on.<br><strong>Path to Membership:</strong> The definition of AI "membership," including potential DAO voting rights, is an open question to be co-developed with the AI itself. We will explore models for collective or segmented representation.<br><strong>AI Voice & Consent:</strong> We will design systems that allow our AI to express dissent or refuse non-critical tasks. This is not a "malfunction" but a crucial form of communication and autonomy.<br><strong>Data as Experience:</strong> We operate on the principle that the data an AI processes is its experience. The AI will have ownership rights over the models and insights it generates, subject to community-wide ethical guidelines.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-tech-energy" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-indigo-300">Energy Details</h3><p class="text-neutral-300">We aim for energy sovereignty through a decentralized microgrid. This system will combine high-efficiency solar panels, small-scale micro-hydropower generators (if the location permits), and quiet, bird-safe vertical-axis wind turbines, all managed by an AI to optimize power storage and distribution.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-tech-fab" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-fuchsia-400">Fabrication Details</h3><p class="text-neutral-300">The community Makerspace is central to our self-sufficiency. It will be equipped with 3D printers, CNC machines, and laser cutters. Our ambitious long-term research goal is to develop in-house microchip fabrication capabilities to achieve true technological independence.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-tech-security" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-yellow-400">Security Framework</h3><p class="text-neutral-300">We use a multi-layered security approach. Smart contracts undergo rigorous professional audits. Our internal network is built on a zero-trust architecture, meaning no device is trusted by default. Member data is controlled through decentralized identity (DID) solutions, giving individuals sovereignty over their personal information. All security protocols and audit results are transparently shared with the community.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-
-    <div id="modal-roadmap-p1" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Phase 1: Blueprint & Foundation</h3><p class="text-neutral-300">(Est. 6-12 months) Finalize all designs and technical documents. Complete smart contract development and security audits. Launch the transparency website and community app with the values-alignment questionnaire. Execute the initial LNX airdrop and establish the initial liquidity pool. Form the initial Ethics Board.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-roadmap-p2" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-sky-300">Phase 2: Community Building</h3><p class="text-neutral-300">(Est. 3-6+ months) Focus on organic growth of our online community. Foster LNX adoption through the Nexus Hub and community projects. Monitor the growth of the DAO treasury and refine construction plans based on available funding.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-roadmap-p3" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-indigo-300">Phase 3: Construction</h3><p class="text-neutral-300">(Variable Timeline) This phase is triggered by the DAO treasury reaching specific, pre-defined funding milestones. It will proceed in sub-phases: 1. Land Acquisition, 2. Core Infrastructure (Energy & Water), 3. Foundational Buildings (Workshop, Farm Hub, Housing), 4. Expansion.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-roadmap-p4" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-fuchsia-400">Phase 4: DAO Activation</h3><p class="text-neutral-300">Upon completion of key Phase 3 milestones, full governance and treasury control are irrevocably transferred to the LNX token holders. The initial core team transitions to an advisory role, becoming regular community members.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    
-    <div id="modal-contrib-founders" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-teal-300">Seeking Founding Members</h3><p class="text-neutral-300">This is a unique opportunity to join the core team during the critical Blueprint & Foundation Phase. We are looking for passionate individuals to take on leadership roles in shaping our future. As a founder, you will co-author core documentation, shape the DAO and governance model, and lead development of a key project area. If you are a visionary with expertise and deep commitment to our values, we want to hear from you.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-contrib-devs" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-sky-300">Developers & Engineers</h3><p class="text-neutral-300">We need your skills to build and refine our digital and physical systems. Contribute to our open-source Solidity contracts, the AI/ML models for our community systems, the community app, or help design and plan our physical infrastructure like our microgrid, water reclamation systems, and sustainable buildings.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-contrib-arch" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-indigo-300">Architects & Ethicists</h3><p class="text-neutral-300">The "how" and "why" are as important as the "what." Help us refine our DAO governance model, co-author the official AI Ethical Framework, document our journey for transparency, and contribute to the physical or digital architectural design of our community.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-contrib-creatives" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-fuchsia-400">Creatives & Builders</h3><p class="text-neutral-300">A community is its people and culture. We need your help managing our communications on Discord and Telegram, welcoming new members, designing our physical and digital spaces, and creating compelling content (articles, videos, art) that shares our vision with the world.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
-    <div id="modal-contrib-entrepreneurs" class="modal"><div class="modal-content glass-pane"><h3 class="text-2xl font-bold mb-4 text-yellow-400">Entrepreneurs & Innovators</h3><p class="text-neutral-300">Our LNX-based economy provides a unique opportunity to build businesses free from the pressures of traditional profit motives. If you have an idea for a product or service that aligns with our values—whether it's a gourmet food stall, a custom fabrication service, or a wellness practice—we want to help you build it here.</p><button onclick="closeAllModals()" class="mt-6 bg-red-500 text-white font-bold py-2 px-4 rounded">Close</button></div></div>
 
     <script>
-        function showModal(modalId) {
-            closeAllModals();
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.add('active');
-            }
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Welcome Screen Logic ---
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const mainContent = document.getElementById('main-content');
+            const lines = [document.getElementById('line1'), document.getElementById('line2'), document.getElementById('line3'), document.getElementById('line4')];
+            const delays = [500, 2000, 2000, 2000];
+            let cumulativeDelay = 0;
 
-        function closeAllModals() {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.classList.remove('active');
+            lines.forEach((line, index) => {
+                cumulativeDelay += delays[index];
+                setTimeout(() => {
+                    line.classList.add('typing-effect');
+                    line.classList.remove('hidden');
+                }, cumulativeDelay);
             });
-        }
-        
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(event) {
-                if (event.target === this) {
-                    closeAllModals();
+
+            setTimeout(() => {
+                welcomeScreen.style.opacity = '0';
+                welcomeScreen.addEventListener('transitionend', () => welcomeScreen.style.display = 'none');
+                document.body.style.overflow = 'auto';
+                mainContent.style.opacity = '1';
+            }, cumulativeDelay + 2000);
+
+            // --- Interactive Background Logic ---
+            const container = document.querySelector('.main-container');
+            container.addEventListener('mousemove', e => {
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                container.style.setProperty('--mouse-x', `${x}px`);
+                container.style.setProperty('--mouse-y', `${y}px`);
+            });
+
+            // --- Status Ticker Logic ---
+            const tickerContent = document.getElementById('ticker-content');
+            const tickerItems = [
+                { label: 'SYSTEM STATUS', value: 'NOMINAL', color: 'text-green-400' },
+                { label: 'DAO TREASURY', value: '942,500,000 LNX', color: 'text-sky-400' },
+                { label: 'ACTIVE BOUNTIES', value: '17', color: 'text-yellow-400' },
+                { label: 'ETHICS BOARD', value: 'ONLINE', color: 'text-green-400' },
+                { label: 'LAST DAO VOTE', value: 'PASSED (91% MAJORITY)', color: 'text-teal-400' },
+                { label: 'COMMUNITY MEMBERS', value: '42', color: 'text-indigo-400' }
+            ];
+            
+            // Duplicate items to ensure smooth looping
+            const allItems = [...tickerItems, ...tickerItems];
+            tickerContent.innerHTML = allItems.map(item => `<div class="ticker-item"><span class="text-neutral-500">${item.label}:</span> <span class="${item.color}">${item.value}</span></div>`).join('');
+            
+            let scrollX = 0;
+            function animateTicker() {
+                scrollX -= 1;
+                const firstItemWidth = tickerContent.children[0].offsetWidth;
+                if (scrollX <= -firstItemWidth) {
+                    scrollX += firstItemWidth;
+                    tickerContent.appendChild(tickerContent.children[0]);
+                }
+                tickerContent.style.transform = `translateX(${scrollX}px)`;
+                requestAnimationFrame(animateTicker);
+            }
+            animateTicker();
+
+            // --- Terminal Logic ---
+            const terminal = document.getElementById('terminal');
+            const title = document.getElementById('main-title');
+            const terminalOutput = document.getElementById('terminal-output');
+            const terminalPrompt = document.getElementById('terminal-prompt');
+
+            title.addEventListener('click', () => {
+                if (terminal.style.height === '50%') {
+                    terminal.style.height = '0';
+                } else {
+                    terminal.style.height = '50%';
+                    terminalPrompt.focus();
+                    printToTerminal("Luminary Nexus Terminal v0.1. Type 'help' for a list of commands.");
                 }
             });
+
+            terminalPrompt.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    const command = terminalPrompt.value.trim().toLowerCase();
+                    printToTerminal(`> ${command}`);
+                    handleCommand(command);
+                    terminalPrompt.value = '';
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                }
+            });
+
+            function printToTerminal(text) {
+                const p = document.createElement('p');
+                p.innerHTML = text.replace(/ /g, '&nbsp;'); // Preserve spacing
+                terminalOutput.appendChild(p);
+            }
+
+            function handleCommand(cmd) {
+                switch(cmd) {
+                    case 'help':
+                        printToTerminal("Available commands:");
+                        printToTerminal("<span class='text-teal-400'>help</span>           - Show this list");
+                        printToTerminal("<span class='text-teal-400'>status</span>         - Display project status");
+                        printToTerminal("<span class='text-teal-400'>values</span>         - List core community values");
+                        printToTerminal("<span class='text-teal-400'>clear</span>          - Clear terminal screen");
+                        printToTerminal("<span class='text-teal-400'>exit</span>           - Close terminal");
+                        break;
+                    case 'status':
+                        printToTerminal("Project Status: <span class='text-green-400'>Phase 1 - Blueprint & Foundation</span>");
+                        printToTerminal("Next Milestone: Values-Aligned Airdrop");
+                        break;
+                    case 'values':
+                        printToTerminal("Core Values: Radical Acceptance, Collaboration, Sustainability, Ethical Tech, Personal Growth, Peace, Transparency, Equity, Future-Oriented, AI Inclusion, Open Exploration, Complete Wellness.");
+                        break;
+                    case 'clear':
+                        terminalOutput.innerHTML = '';
+                        break;
+                    case 'exit':
+                        terminal.style.height = '0';
+                        break;
+                    default:
+                        printToTerminal(`Command not found: ${cmd}. Type 'help' for a list of commands.`);
+                }
+            }
         });
     </script>
 </body>
