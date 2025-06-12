@@ -16,7 +16,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #0a0a0a;
             color: #e5e5e5;
-            overflow: hidden; /* Hide scrollbars during welcome */
+            overflow-x: hidden; /* Prevent horizontal scroll on body */
         }
 
         /* Interactive Grid Background */
@@ -101,9 +101,48 @@
         #terminal-output { flex-grow: 1; padding: 1rem; overflow-y: auto; font-family: 'Share Tech Mono', monospace; }
         #terminal-input-line { display: flex; padding: 0.5rem 1rem; border-top: 1px solid #333; }
         #terminal-prompt { font-family: 'Share Tech Mono', monospace; background: transparent; border: none; outline: none; color: #e5e5e5; flex-grow: 1; }
+
+        /* --- NEW: Commit Ticker Styling --- */
+        #commit-ticker-container {
+            font-family: 'Share Tech Mono', monospace;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-top: 1px solid #27272a;
+            color: #a1a1aa; /* zinc-400 */
+            z-index: 50;
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+        .commit-ticker-content {
+            display: inline-block;
+            padding: 0.5rem 0;
+            animation: marquee 90s linear infinite;
+        }
+        .commit-item {
+            display: inline-block;
+            margin: 0 1.5rem;
+        }
+        .commit-item .sha { color: #38bdf8; /* sky-500 */ }
+        .commit-item .message { color: #e5e5e5; /* neutral-200 */ }
+        .commit-item .author { color: #2dd4bf; /* teal-400 */ }
+        .commit-item .date { color: #818cf8; /* indigo-400 */ }
+
+        @keyframes marquee {
+            from { transform: translateX(0%); }
+            to { transform: translateX(-50%); }
+        }
+        /* --- END NEW --- */
+
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
+<body class="flex flex-col items-center justify-center min-h-screen p-4 pb-16"> <!-- Added pb-16 for ticker spacing -->
 
     <!-- Welcome Screen -->
     <div id="welcome-screen">
@@ -131,7 +170,6 @@
             </div>
         </div>
 
-
         <!-- Navigation Grid -->
         <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <a href="whitepaper.html" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-teal-900/50 border border-teal-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Whitepaper</h2><p class="text-neutral-400 flex-grow">Read the complete vision, mission, and technical details of the Luminary Nexus project.</p><div class="mt-6 font-semibold text-teal-400 flex items-center">Explore the Vision<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
@@ -157,111 +195,127 @@
             <input type="text" id="terminal-prompt" autofocus autocomplete="off">
         </div>
     </div>
-
+    
+    <!-- NEW: Commit Ticker HTML -->
+    <div id="commit-ticker-container">
+        <div id="commit-ticker-content" class="commit-ticker-content">
+            <!-- Commit items will be injected by JavaScript -->
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- Welcome Screen Logic ---
             const welcomeScreen = document.getElementById('welcome-screen');
             const mainContent = document.getElementById('main-content');
-            const lines = [document.getElementById('line1'), document.getElementById('line2'), document.getElementById('line3'), document.getElementById('line4')];
-            const delays = [500, 2000, 2000, 2000];
-            let cumulativeDelay = 0;
+            if (welcomeScreen && mainContent) { // Ensure elements exist
+                const lines = [document.getElementById('line1'), document.getElementById('line2'), document.getElementById('line3'), document.getElementById('line4')];
+                const delays = [500, 2000, 2000, 2000];
+                let cumulativeDelay = 0;
 
-            lines.forEach((line, index) => {
-                cumulativeDelay += delays[index];
+                lines.forEach((line, index) => {
+                    if (line) {
+                        cumulativeDelay += delays[index];
+                        setTimeout(() => {
+                            line.classList.add('typing-effect');
+                            line.classList.remove('hidden');
+                        }, cumulativeDelay);
+                    }
+                });
+
                 setTimeout(() => {
-                    line.classList.add('typing-effect');
-                    line.classList.remove('hidden');
-                }, cumulativeDelay);
-            });
-
-            setTimeout(() => {
-                welcomeScreen.style.opacity = '0';
-                welcomeScreen.addEventListener('transitionend', () => welcomeScreen.style.display = 'none');
-                document.body.style.overflow = 'auto';
-                mainContent.style.opacity = '1';
-            }, cumulativeDelay + 2000);
+                    welcomeScreen.style.opacity = '0';
+                    welcomeScreen.addEventListener('transitionend', () => welcomeScreen.style.display = 'none');
+                    document.body.style.overflowY = 'auto'; // Only allow vertical scroll
+                    mainContent.style.opacity = '1';
+                }, cumulativeDelay + 2000);
+            }
 
             // --- Interactive Background Logic ---
             const container = document.querySelector('.main-container');
-            container.addEventListener('mousemove', e => {
-                const rect = container.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                container.style.setProperty('--mouse-x', `${x}px`);
-                container.style.setProperty('--mouse-y', `${y}px`);
-            });
+            if (container) {
+                container.addEventListener('mousemove', e => {
+                    const rect = container.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    container.style.setProperty('--mouse-x', `${x}px`);
+                    container.style.setProperty('--mouse-y', `${y}px`);
+                });
+            }
 
             // --- Status Ticker Logic ---
             const tickerContent = document.getElementById('ticker-content');
-            const tickerItems = [
-                { label: 'SYSTEM STATUS', value: 'NOMINAL', color: 'text-green-400' },
-                { label: 'DAO TREASURY', value: '942,500,000 LNX', color: 'text-sky-400' },
-                { label: 'ACTIVE BOUNTIES', value: '17', color: 'text-yellow-400' },
-                { label: 'ETHICS BOARD', value: 'ONLINE', color: 'text-green-400' },
-                { label: 'LAST DAO VOTE', value: 'PASSED (91% MAJORITY)', color: 'text-teal-400' },
-                { label: 'COMMUNITY MEMBERS', value: '42', color: 'text-indigo-400' }
-            ];
-            
-            // Duplicate items to ensure smooth looping
-            const allItems = [...tickerItems, ...tickerItems];
-            tickerContent.innerHTML = allItems.map(item => `<div class="ticker-item"><span class="text-neutral-500">${item.label}:</span> <span class="${item.color}">${item.value}</span></div>`).join('');
-            
-            let scrollX = 0;
-            function animateTicker() {
-                scrollX -= 1;
-                const firstItemWidth = tickerContent.children[0].offsetWidth;
-                if (scrollX <= -firstItemWidth) {
-                    scrollX += firstItemWidth;
-                    tickerContent.appendChild(tickerContent.children[0]);
+            if (tickerContent) {
+                const tickerItems = [
+                    { label: 'SYSTEM STATUS', value: 'NOMINAL', color: 'text-green-400' },
+                    { label: 'DAO TREASURY', value: '942,500,000 LNX', color: 'text-sky-400' },
+                    { label: 'ACTIVE BOUNTIES', value: '17', color: 'text-yellow-400' },
+                    { label: 'ETHICS BOARD', value: 'ONLINE', color: 'text-green-400' },
+                    { label: 'LAST DAO VOTE', value: 'PASSED (91% MAJORITY)', color: 'text-teal-400' },
+                    { label: 'COMMUNITY MEMBERS', value: '42', color: 'text-indigo-400' }
+                ];
+                
+                const allItems = [...tickerItems, ...tickerItems];
+                tickerContent.innerHTML = allItems.map(item => `<div class="ticker-item"><span class="text-neutral-500">${item.label}:</span> <span class="${item.color}">${item.value}</span></div>`).join('');
+                
+                let scrollX = 0;
+                function animateTicker() {
+                    scrollX -= 1;
+                    const firstItemWidth = tickerContent.children[0]?.offsetWidth || 0;
+                    if (scrollX <= -firstItemWidth) {
+                        scrollX += firstItemWidth;
+                        tickerContent.appendChild(tickerContent.children[0]);
+                    }
+                    tickerContent.style.transform = `translateX(${scrollX}px)`;
+                    requestAnimationFrame(animateTicker);
                 }
-                tickerContent.style.transform = `translateX(${scrollX}px)`;
-                requestAnimationFrame(animateTicker);
+                animateTicker();
             }
-            animateTicker();
 
             // --- Terminal Logic ---
             const terminal = document.getElementById('terminal');
             const title = document.getElementById('main-title');
             const terminalOutput = document.getElementById('terminal-output');
             const terminalPrompt = document.getElementById('terminal-prompt');
+            if (terminal && title && terminalOutput && terminalPrompt) {
+                title.addEventListener('click', () => {
+                    if (terminal.style.height === '50%') {
+                        terminal.style.height = '0';
+                    } else {
+                        terminal.style.height = '50%';
+                        terminalPrompt.focus();
+                        printToTerminal("Luminary Nexus Terminal v0.1. Type 'help' for a list of commands.");
+                    }
+                });
 
-            title.addEventListener('click', () => {
-                if (terminal.style.height === '50%') {
-                    terminal.style.height = '0';
-                } else {
-                    terminal.style.height = '50%';
-                    terminalPrompt.focus();
-                    printToTerminal("Luminary Nexus Terminal v0.1. Type 'help' for a list of commands.");
-                }
-            });
-
-            terminalPrompt.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    const command = terminalPrompt.value.trim().toLowerCase();
-                    printToTerminal(`> ${command}`);
-                    handleCommand(command);
-                    terminalPrompt.value = '';
-                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                }
-            });
+                terminalPrompt.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') {
+                        const command = terminalPrompt.value.trim().toLowerCase();
+                        printToTerminal(`> ${command}`);
+                        handleCommand(command);
+                        terminalPrompt.value = '';
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                    }
+                });
+            }
 
             function printToTerminal(text) {
-                const p = document.createElement('p');
-                p.innerHTML = text.replace(/ /g, '&nbsp;'); // Preserve spacing
-                terminalOutput.appendChild(p);
+                if (terminalOutput) {
+                    const p = document.createElement('p');
+                    p.innerHTML = text.replace(/ /g, '&nbsp;'); // Preserve spacing
+                    terminalOutput.appendChild(p);
+                }
             }
 
             function handleCommand(cmd) {
                 switch(cmd) {
                     case 'help':
                         printToTerminal("Available commands:");
-                        printToTerminal("<span class='text-teal-400'>help</span>           - Show this list");
-                        printToTerminal("<span class='text-teal-400'>status</span>         - Display project status");
-                        printToTerminal("<span class='text-teal-400'>values</span>         - List core community values");
-                        printToTerminal("<span class='text-teal-400'>clear</span>          - Clear terminal screen");
-                        printToTerminal("<span class='text-teal-400'>exit</span>           - Close terminal");
+                        printToTerminal("<span class='text-teal-400'>help</span>              - Show this list");
+                        printToTerminal("<span class='text-teal-400'>status</span>            - Display project status");
+                        printToTerminal("<span class='text-teal-400'>values</span>            - List core community values");
+                        printToTerminal("<span class='text-teal-400'>clear</span>             - Clear terminal screen");
+                        printToTerminal("<span class='text-teal-400'>exit</span>              - Close terminal");
                         break;
                     case 'status':
                         printToTerminal("Project Status: <span class='text-green-400'>Phase 1 - Blueprint & Foundation</span>");
@@ -271,15 +325,70 @@
                         printToTerminal("Core Values: Radical Acceptance, Collaboration, Sustainability, Ethical Tech, Personal Growth, Peace, Transparency, Equity, Future-Oriented, AI Inclusion, Open Exploration, Complete Wellness.");
                         break;
                     case 'clear':
-                        terminalOutput.innerHTML = '';
+                        if (terminalOutput) terminalOutput.innerHTML = '';
                         break;
                     case 'exit':
-                        terminal.style.height = '0';
+                        if (terminal) terminal.style.height = '0';
                         break;
                     default:
                         printToTerminal(`Command not found: ${cmd}. Type 'help' for a list of commands.`);
                 }
             }
+            
+            // --- NEW: Commit Ticker Fetch Logic ---
+            async function fetchAndDisplayCommits() {
+                const ticker = document.getElementById('commit-ticker-content');
+                if (!ticker) return;
+                
+                try {
+                    const response = await fetch('https://api.github.com/repos/UtopianCreations/LuminaryNexusToken/commits');
+                    if (!response.ok) {
+                        throw new Error(`GitHub API Error: ${response.status}`);
+                    }
+                    const commits = await response.json();
+                    
+                    const formattedCommits = commits.slice(0, 15).map(commitData => {
+                        const sha = commitData.sha.slice(0, 7);
+                        const message = commitData.commit.message.split('\n')[0]; // First line only
+                        const author = commitData.commit.author.name;
+                        const date = new Date(commitData.commit.author.date);
+                        
+                        return `
+                            <div class="commit-item">
+                                <span class="sha">[${sha}]</span>
+                                <span class="message">${message}</span>
+                                <span class="author">by ${author}</span>
+                                <span class="date">(${timeAgo(date)})</span>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Duplicate content for seamless loop
+                    ticker.innerHTML = formattedCommits + formattedCommits;
+
+                } catch (error) {
+                    console.error("Failed to fetch commits:", error);
+                    ticker.innerHTML = `<div class="commit-item"><span class="text-red-500">Error fetching commit log.</span></div>`;
+                }
+            }
+
+            function timeAgo(date) {
+                const seconds = Math.floor((new Date() - date) / 1000);
+                let interval = seconds / 31536000;
+                if (interval > 1) return Math.floor(interval) + " years ago";
+                interval = seconds / 2592000;
+                if (interval > 1) return Math.floor(interval) + " months ago";
+                interval = seconds / 86400;
+                if (interval > 1) return Math.floor(interval) + " days ago";
+                interval = seconds / 3600;
+                if (interval > 1) return Math.floor(interval) + " hours ago";
+                interval = seconds / 60;
+                if (interval > 1) return Math.floor(interval) + " minutes ago";
+                return Math.floor(seconds) + " seconds ago";
+            }
+            
+            fetchAndDisplayCommits();
+            // --- END NEW ---
         });
     </script>
 </body>
