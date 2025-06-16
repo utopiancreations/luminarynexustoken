@@ -62,7 +62,14 @@
             align-items: center; justify-content: center;
             font-family: 'Share Tech Mono', monospace; transition: opacity 1s ease-out;
         }
-        .typing-effect { overflow: hidden; white-space: nowrap; animation: typing 2s steps(40, end); display: inline-block; }
+        /* Corrected Typing Animation Style */
+        .typing-effect { 
+            overflow: hidden; 
+            white-space: nowrap; 
+            animation: typing 2s steps(40, end); 
+            display: block;
+            margin-bottom: 0.5rem;
+        }
         .blinking-cursor { animation: blink-caret .75s step-end infinite; display: inline-block; vertical-align: bottom; }
         @keyframes typing { from { width: 0 } to { width: 100% } }
         @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #14d5e4; } }
@@ -79,7 +86,7 @@
         .glass-card::before {
             content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
             z-index: -1; margin: -1px; border-radius: inherit; 
-            background: conic-gradient(from 180deg at 50% 50%, #2dd4bf 0deg, #38bdf8 120deg, #818cf8 240deg, #2dd4bf 360deg);
+            background: conic-gradient(from 180deg at 50% 50%, var(--glow-start, #2dd4bf) 0deg, var(--glow-mid, #38bdf8) 120deg, var(--glow-end, #818cf8) 240deg, var(--glow-start, #2dd4bf) 360deg);
             opacity: 0; transition: opacity 0.4s ease;
         }
         .glass-card:hover::before { opacity: 1; }
@@ -102,7 +109,7 @@
         #terminal-input-line { display: flex; padding: 0.5rem 1rem; border-top: 1px solid #333; }
         #terminal-prompt { font-family: 'Share Tech Mono', monospace; background: transparent; border: none; outline: none; color: #e5e5e5; flex-grow: 1; }
 
-        /* --- NEW: Commit Ticker Styling --- */
+        /* Commit Ticker Styling */
         #commit-ticker-container {
             font-family: 'Share Tech Mono', monospace;
             position: fixed;
@@ -113,7 +120,7 @@
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             border-top: 1px solid #27272a;
-            color: #a1a1aa; /* zinc-400 */
+            color: #a1a1aa;
             z-index: 50;
             overflow: hidden;
             white-space: nowrap;
@@ -129,20 +136,19 @@
             display: inline-block;
             margin: 0 1.5rem;
         }
-        .commit-item .sha { color: #38bdf8; /* sky-500 */ }
-        .commit-item .message { color: #e5e5e5; /* neutral-200 */ }
-        .commit-item .author { color: #2dd4bf; /* teal-400 */ }
-        .commit-item .date { color: #818cf8; /* indigo-400 */ }
+        .commit-item .sha { color: #38bdf8; }
+        .commit-item .message { color: #e5e5e5; }
+        .commit-item .author { color: #2dd4bf; }
+        .commit-item .date { color: #818cf8; }
 
         @keyframes marquee {
             from { transform: translateX(0%); }
             to { transform: translateX(-50%); }
         }
-        /* --- END NEW --- */
 
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4 pb-16"> <!-- Added pb-16 for ticker spacing -->
+<body class="flex flex-col items-center justify-center min-h-screen p-4 pb-16">
 
     <!-- Welcome Screen -->
     <div id="welcome-screen">
@@ -172,6 +178,32 @@
 
         <!-- Navigation Grid -->
         <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Education Card -->
+            <a href="education1.html" class="glass-card group md:col-span-2 lg:col-span-3" style="--glow-start: #f59e0b; --glow-mid: #fbbf24; --glow-end: #fcd34d;">
+                <div class="glass-card-content p-8 flex flex-col md:flex-row items-center text-center md:text-left gap-8">
+                    <div class="p-4 bg-amber-900/50 border border-amber-700 rounded-xl flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                        </svg>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+                             <h2 class="text-2xl font-bold text-neutral-100">Project Fundamentals</h2>
+                             <span class="text-xs font-mono bg-amber-500/20 text-amber-300 px-2 py-1 rounded-full">New? Start Here</span>
+                        </div>
+                        <p class="text-neutral-400">An interactive course on the core concepts of Blockchain, DAOs, and Smart Contracts. No prior knowledge required.</p>
+                    </div>
+                    <div class="mt-6 md:mt-0 font-semibold text-amber-400 flex items-center flex-shrink-0">
+                        Begin Your Journey
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Existing Cards -->
             <a href="whitepaper.html" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-teal-900/50 border border-teal-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Whitepaper</h2><p class="text-neutral-400 flex-grow">Read the complete vision, mission, and technical details of the Luminary Nexus project.</p><div class="mt-6 font-semibold text-teal-400 flex items-center">Explore the Vision<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
             <a href="questionnaire.html" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-sky-900/50 border border-sky-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Values Questionnaire</h2><p class="text-neutral-400 flex-grow">Take our values-alignment questionnaire to see if you're a fit for the community and for a potential LNX airdrop.</p><div class="mt-6 font-semibold text-sky-400 flex items-center">Check Your Alignment<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
             <a href="communitystructure.html" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-indigo-900/50 border border-indigo-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Architectural Blueprint</h2><p class="text-neutral-400 flex-grow">Explore the physical design, concentric ring layout, and sustainable construction philosophy of our community.</p><div class="mt-6 font-semibold text-indigo-400 flex items-center">View the Structure<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
@@ -196,7 +228,7 @@
         </div>
     </div>
     
-    <!-- NEW: Commit Ticker HTML -->
+    <!-- Commit Ticker HTML -->
     <div id="commit-ticker-container">
         <div id="commit-ticker-content" class="commit-ticker-content">
             <!-- Commit items will be injected by JavaScript -->
@@ -205,28 +237,37 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Welcome Screen Logic ---
+            // --- Welcome Screen Logic (with sessionStorage) ---
             const welcomeScreen = document.getElementById('welcome-screen');
             const mainContent = document.getElementById('main-content');
-            if (welcomeScreen && mainContent) { // Ensure elements exist
+            const hasSeenWelcome = sessionStorage.getItem('lnx-hub-welcome-shown');
+
+            if (hasSeenWelcome) {
+                welcomeScreen.style.display = 'none';
+                document.body.style.overflowY = 'auto';
+                mainContent.style.opacity = '1';
+            } else {
                 const lines = [document.getElementById('line1'), document.getElementById('line2'), document.getElementById('line3'), document.getElementById('line4')];
-                const delays = [500, 2000, 2000, 2000];
+                const delays = [500, 1500, 1500, 1500]; // Adjusted delays for better pacing
                 let cumulativeDelay = 0;
 
                 lines.forEach((line, index) => {
                     if (line) {
                         cumulativeDelay += delays[index];
                         setTimeout(() => {
-                            line.classList.add('typing-effect');
                             line.classList.remove('hidden');
+                            line.classList.add('typing-effect');
                         }, cumulativeDelay);
                     }
                 });
 
                 setTimeout(() => {
                     welcomeScreen.style.opacity = '0';
-                    welcomeScreen.addEventListener('transitionend', () => welcomeScreen.style.display = 'none');
-                    document.body.style.overflowY = 'auto'; // Only allow vertical scroll
+                    welcomeScreen.addEventListener('transitionend', () => {
+                        welcomeScreen.style.display = 'none';
+                        sessionStorage.setItem('lnx-hub-welcome-shown', 'true');
+                    });
+                    document.body.style.overflowY = 'auto';
                     mainContent.style.opacity = '1';
                 }, cumulativeDelay + 2000);
             }
@@ -315,6 +356,7 @@
                         printToTerminal("<span class='text-teal-400'>status</span>            - Display project status");
                         printToTerminal("<span class='text-teal-400'>values</span>            - List core community values");
                         printToTerminal("<span class='text-teal-400'>clear</span>             - Clear terminal screen");
+                        printToTerminal("<span class='text-teal-400'>resetwelcome</span>      - Reset welcome animation for testing");
                         printToTerminal("<span class='text-teal-400'>exit</span>              - Close terminal");
                         break;
                     case 'status':
@@ -327,6 +369,10 @@
                     case 'clear':
                         if (terminalOutput) terminalOutput.innerHTML = '';
                         break;
+                    case 'resetwelcome':
+                        sessionStorage.removeItem('lnx-hub-welcome-shown');
+                        printToTerminal("Welcome animation reset. <span class='text-yellow-400'>Reload the page to see it again.</span>");
+                        break;
                     case 'exit':
                         if (terminal) terminal.style.height = '0';
                         break;
@@ -335,7 +381,7 @@
                 }
             }
             
-            // --- NEW: Commit Ticker Fetch Logic ---
+            // --- Commit Ticker Fetch Logic ---
             async function fetchAndDisplayCommits() {
                 const ticker = document.getElementById('commit-ticker-content');
                 if (!ticker) return;
@@ -388,7 +434,6 @@
             }
             
             fetchAndDisplayCommits();
-            // --- END NEW ---
         });
     </script>
 </body>

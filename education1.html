@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=de-width, initial-scale=1.0">
+    <title>LNX EDU | Module 1: Blockchain Fundamentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* LCARS Cyberpunk Theme v8 - Navigation Button Added */
+        :root {
+            --lcars-bg: #000000;
+            --lcars-primary: #9C82D4; /* Purple */
+            --lcars-secondary: #5C73F2; /* Blue */
+            --lcars-accent: #F29E38; /* Orange */
+            --lcars-text: #E0E0E0;
+            --lcars-header-font: 'Orbitron', sans-serif;
+            --lcars-body-font: 'Roboto Condensed', sans-serif;
+        }
+
+        body {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-text);
+            font-family: var(--lcars-body-font);
+            overflow-x: hidden;
+        }
+
+        .lcars-container {
+            display: flex;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* LCARS Sidebar Structure */
+        .lcars-sidebar-container {
+            width: 80px; /* Consistent width */
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            margin-right: 1.5rem;
+        }
+
+        .lcars-elbow {
+            height: 80px;
+            width: 100%;
+            background: var(--lcars-primary);
+            border-top-left-radius: 40px;
+        }
+
+        .lcars-main-bar {
+            flex-grow: 1;
+            width: 100%;
+            background: var(--lcars-primary);
+        }
+        
+        .lcars-tail {
+            height: 40px;
+            width: 100%;
+            background: var(--lcars-primary);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .lcars-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .lcars-header {
+            font-family: var(--lcars-header-font);
+            color: var(--lcars-accent);
+            border-bottom: 2px solid var(--lcars-secondary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+
+        /* Accordion styles */
+        .accordion-header {
+            background-color: var(--lcars-secondary);
+            color: var(--lcars-bg);
+            padding: 0.75rem 1.5rem;
+            font-family: var(--lcars-header-font);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-left: 8px solid var(--lcars-accent);
+            margin-top: 1rem;
+        }
+        .accordion-header:hover, .accordion-header.active {
+            background-color: var(--lcars-primary);
+        }
+        .accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            background-color: rgba(30, 30, 40, 0.5);
+            border-left: 2px solid var(--lcars-secondary);
+            margin-left: 8px;
+        }
+        .accordion-content {
+             padding: 1.5rem;
+        }
+        .analogy {
+            background: rgba(0,0,0,0.3);
+            border-left: 4px solid var(--lcars-accent);
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+        
+        /* Visuals for sections */
+        .section-visual {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .visual-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 120px;
+        }
+        .visual-item svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Vertical Flowchart styles */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 0;
+        }
+        .flow-box {
+            background-color: var(--lcars-bg);
+            border: 2px solid var(--lcars-primary);
+            padding: 1rem;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .flow-box:hover {
+            background-color: rgba(156, 130, 212, 0.2);
+            border-color: var(--lcars-accent);
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--lcars-accent);
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--lcars-bg);
+            border: 2px solid var(--lcars-primary);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--lcars-text-dark);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--lcars-accent);
+        }
+        .modal-title {
+            font-family: var(--lcars-header-font);
+            color: var(--lcars-accent);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--lcars-secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        /* LCARS Button Style */
+        .lcars-button {
+            display: inline-block;
+            background-color: var(--lcars-accent);
+            color: var(--lcars-bg);
+            padding: 0.75rem 2rem;
+            font-family: var(--lcars-header-font);
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 2rem;
+            text-align: center;
+            transition: background-color 0.3s;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            border: 2px solid var(--lcars-accent);
+        }
+        .lcars-button:hover {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-accent);
+        }
+
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .lcars-container {
+                flex-direction: column;
+            }
+            .lcars-sidebar-container {
+                flex-direction: row;
+                width: 100%;
+                height: 60px;
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            .lcars-elbow {
+                width: 80px;
+                height: 100%;
+                border-top-left-radius: 30px;
+                border-bottom-left-radius: 30px;
+                border-top-right-radius: 0;
+            }
+            .lcars-main-bar {
+                height: 40px;
+                flex-grow: 1;
+                align-self: flex-end;
+            }
+            .lcars-tail {
+                width: 40px;
+                height: 40px;
+                align-self: flex-end;
+                border-radius: 0;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lcars-container">
+        <!-- LCARS side bar -->
+        <aside class="lcars-sidebar-container">
+            <div class="lcars-elbow"></div>
+            <div class="lcars-main-bar"></div>
+            <div class="lcars-tail"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lcars-content-wrapper">
+            <header class="lcars-header">
+                <h1 class="text-3xl">LNX EDU // MODULE 01</h1>
+                <h2 class="text-xl text-gray-400">SUBJECT: BLOCKCHAIN FUNDAMENTALS</h2>
+            </header>
+
+            <!-- Accordion Item 1: The 'Why' -->
+            <div>
+                <div class="accordion-header">1.0 // THE "WHY": A PROBLEM OF TRUST</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <div class="section-visual">
+                            <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-secondary)" stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                                <span>Central Server</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-accent)" stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                                <span>Single Point of Failure</span>
+                            </div>
+                        </div>
+                        <p class="mb-4">In our digital world, most information is centralized. This data is stored on servers controlled by a single entity, creating a single point of failure and requiring absolute trust in that authority. This model has inherent vulnerabilities that affect finance, data ownership, and governance.</p>
+                        <ul class="list-disc list-inside ml-4 mb-4">
+                            <li><strong>Data Security:</strong> Centralized databases are prime targets for hackers. A single breach can expose the sensitive information of millions of users.</li>
+                            <li><strong>Censorship & Control:</strong> A central authority can unilaterally decide to delete data, deny access, or manipulate records to suit its agenda. This is a critical issue for free speech and historical preservation.</li>
+                            <li><strong>Inefficiency:</strong> When multiple organizations need to work with the same data, they each maintain their own separate, siloed ledgers. Reconciling these ledgers is time-consuming, expensive, and prone to error.</li>
+                        </ul>
+                        <p>Blockchain was conceived as a new technological paradigm to solve these problems by creating a system of record that is secure, transparent, and resilient by its very design, without needing a central coordinator.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 2: The 'What' -->
+            <div>
+                <div class="accordion-header">2.0 // THE "WHAT": A SHARED DIGITAL NOTEBOOK</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                         <div class="section-visual">
+                            <div class="visual-item">
+                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-primary)" stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" /></svg>
+                                <span>Distributed Network</span>
+                            </div>
+                        </div>
+                        <p class="mb-4">At its core, a <strong>blockchain is a distributed, immutable ledger.</strong> Instead of one person holding the notebook, thousands of participants ("nodes") hold identical copies. These nodes form a peer-to-peer network and work together to maintain a single, shared source of truth.</p>
+                        <p class="mb-4">When new information (a "transaction") is added, it is bundled into a "block" which is then cryptographically chained to the previous block. This creates a chronological, unbreakable record. If someone tries to alter a past transaction, it would change the fingerprint of that block, and the discrepancy would be immediately rejected by the rest of the network.</p>
+                        <div class="analogy">
+                            <h4 class="font-bold text-white mb-2">GLOBAL ANALOGY: THE RAI STONES OF YAP</h4>
+                            <p>The entire community maintained a shared oral history—a mental ledger—of who owned which massive Rai stone. No single chief controlled the ledger; it was decentralized and secured by the shared consensus of the community. If one person claimed to own a stone that the rest of the community knew belonged to someone else, that claim would be instantly invalidated by the collective.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 3: The Three Pillars -->
+            <div>
+                <div class="accordion-header">3.0 // THE THREE PILLARS OF BLOCKCHAIN</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <div class="section-visual">
+                            <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-secondary)" stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-1.546 1.546a9 9 0 1 1-12.454 0L4.5 4.5m14.25 0v7.5a7.5 7.5 0 0 1-7.5 7.5s-7.5-3.358-7.5-7.5v-7.5" /></svg>
+                                <span>Decentralization</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-primary)" stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639l4.25-7.5a1.012 1.012 0 0 1 1.732 0l4.25 7.5a1.012 1.012 0 0 1 0 .639l-4.25 7.5a1.012 1.012 0 0 1-1.732 0l-4.25-7.5Z" /><path stroke="var(--lcars-accent)" stroke-linecap="round" stroke-linejoin="round" d="M12.005 12.005h.009v.004h-.009v-.004Z" /></svg>
+                                <span>Transparency</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-secondary)" stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                                <span>Immutability</span>
+                            </div>
+                        </div>
+                         <p class="mb-4">These three interconnected principles work together to create a uniquely robust and trustworthy system:</p>
+                        <ul class="list-disc list-inside ml-4 mb-4">
+                            <li><strong>Decentralization:</strong> Power and control are distributed across many participants rather than concentrated in one place. This makes the network resilient; there is no central point to attack or corrupt.</li>
+                            <li><strong>Transparency:</strong> On public blockchains, anyone can view the ledger of transactions. This doesn't mean your real-world identity is exposed; users are pseudonymous (e.g., `0x1a2b...`). This transparency allows for public verifiability and audits, fostering accountability.</li>
+                             <li><strong>Immutability:</strong> Once data is confirmed and added to the blockchain, it is secured by cryptography and cannot be changed or deleted. Each block contains a hash (a unique digital fingerprint) of the previous block, creating a secure chain. Altering one block would require altering every subsequent block, an impossible feat on a large network.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 4: The 'How' -->
+            <div>
+                <div class="accordion-header">4.0 // THE "HOW": BLOCKS, CHAINS, & CONSENSUS</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <h4 class="font-bold text-white mb-2 text-lg">4.1 // The Life of a Transaction</h4>
+                        <p>This flowchart shows the basic journey. Click any step for more details.</p>
+                        <div class="flowchart">
+                            <div class="flow-box" data-title="1. Transaction Created" data-text="A user initiates a transaction using their digital wallet. This action creates a digitally signed message containing transaction details (e.g., sender, receiver, amount). This signature, created with the user's private key, proves ownership and intent without revealing the key itself.">Transaction<br>Created</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="2. Broadcast to Network" data-text="The transaction is sent out to the peer-to-peer network. It travels from one node (a participant computer) to another until it has propagated across the entire network. At this stage, it exists in a 'mempool'—a waiting area for unconfirmed transactions.">Broadcast to<br>Network (Nodes)</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="3. Gathered into a Block" data-text="Specialized nodes, known as 'miners' (in PoW) or 'validators' (in PoS), select a group of transactions from the mempool. They bundle these transactions together into a new, proposed 'block'. This block also includes the hash of the previous block, which is critical for linking the chain together.">Validators/Miners<br>gather into a Block</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="4. Consensus Reached" data-text="This is the crucial step. The network must agree on the validity of the new block. Miners/validators perform work or stake collateral (depending on the consensus mechanism) to earn the right to add their block to the chain. This process ensures all participants agree on a single, shared history.">Consensus<br>Reached</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="5. Block Added to the Chain" data-text="Once a block is validated through consensus, it is cryptographically linked to the previous block, creating a chronological and unbreakable chain. The transactions inside are now considered confirmed and immutable. The record is permanent.">Block added to<br>the Chain</div>
+                        </div>
+                        
+                        <h4 class="font-bold text-white mb-2 mt-8 text-lg">4.2 // Consensus: Proof of Work (PoW)</h4>
+                        <p class="mb-4">Proof of Work was the pioneering consensus mechanism, introduced by Bitcoin. It establishes trust in a trustless environment by making it computationally expensive to add new blocks, but cheap to verify them. This asymmetry is the key to its security.</p>
+                        <div class="analogy">
+                             <h4 class="font-bold text-white mb-2">ANALOGY: A GLOBAL SUDOKU COMPETITION</h4>
+                             <p>Competitors ('miners') race to solve an incredibly difficult puzzle. The first to solve it gets to add the next 'page' (block) to the notebook and is rewarded. This 'work' secures the network.</p>
+                        </div>
+                        <p class="mt-4"><strong class="text-white">PROS:</strong> Extremely secure and battle-tested over more than a decade.<br><strong class="text-white">CONS:</strong> Consumes vast amounts of energy; specialized hardware (ASICs) can lead to centralization of mining power.</p>
+
+                        <h4 class="font-bold text-white mb-2 mt-8 text-lg">4.3 // Consensus: Proof of Stake (PoS)</h4>
+                        <p class="mb-4">Proof of Stake emerged as a more energy-efficient alternative. Instead of relying on computational work, it relies on an economic stake. Validators lock up a certain amount of the network's native currency as collateral. Their chance of being chosen to propose the next block is often proportional to the size of their stake.</p>
+                         <div class="analogy">
+                             <h4 class="font-bold text-white mb-2">ANALOGY: A HIGH-STAKES RAFFLE</h4>
+                             <p>Participants ('validators') buy raffle tickets with their own money (their 'stake'). A winner is chosen to add the next block. If they cheat, their tickets are destroyed. The financial risk ensures honesty.</p>
+                        </div>
+                        <p class="mt-4"><strong class="text-white">PROS:</strong> Highly energy-efficient (up to 99.9% less energy than PoW); lower barrier to entry for participation.<br><strong class="text-white">CONS:</strong> Newer and less battle-tested than PoW; can potentially lead to wealth concentration where large stakeholders have more influence.</p>
+
+                        <div class="text-center">
+                            <a href="education2.html" class="lcars-button">PROCEED TO MODULE 2: DAOs & GOVERNANCE &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="modal-close-btn" class="modal-close">&times;</span>
+            <h3 id="modal-title" class="modal-title"></h3>
+            <p id="modal-text"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const wasActive = this.classList.contains('active');
+
+                    // Close all panels first
+                    accordionHeaders.forEach(h => {
+                        h.classList.remove('active');
+                        h.nextElementSibling.style.maxHeight = null;
+                    });
+
+                    // If the clicked panel was not already open, open it
+                    if (!wasActive) {
+                        this.classList.add('active');
+                        const panel = this.nextElementSibling;
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                    }
+                });
+            });
+
+            // Automatically open the first accordion item on page load
+            if (accordionHeaders.length > 0) {
+                const firstHeader = accordionHeaders[0];
+                firstHeader.classList.add('active');
+                const firstPanel = firstHeader.nextElementSibling;
+                // Use a small timeout to ensure layout is calculated before setting maxHeight
+                setTimeout(() => {
+                    firstPanel.style.maxHeight = firstPanel.scrollHeight + "px";
+                }, 100);
+            }
+
+            // Modal Logic
+            const modal = document.getElementById('info-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const closeBtn = document.getElementById('modal-close-btn');
+            const flowBoxes = document.querySelectorAll('.flow-box');
+
+            flowBoxes.forEach(box => {
+                box.addEventListener('click', function() {
+                    const title = this.getAttribute('data-title');
+                    const text = this.getAttribute('data-text');
+                    
+                    modalTitle.textContent = title;
+                    modalText.textContent = text;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LNX EDU | Module 3: Smart Contracts & Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* LCARS Cyberpunk Theme v8 - Module 3 */
+        :root {
+            --lcars-bg: #000000;
+            --lcars-primary: #9C82D4; /* Purple */
+            --lcars-secondary: #5C73F2; /* Blue */
+            --lcars-accent: #F29E38; /* Orange */
+            --lcars-text: #E0E0E0;
+            --lcars-header-font: 'Orbitron', sans-serif;
+            --lcars-body-font: 'Roboto Condensed', sans-serif;
+        }
+
+        body {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-text);
+            font-family: var(--lcars-body-font);
+            overflow-x: hidden;
+        }
+
+        .lcars-container {
+            display: flex;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* LCARS Sidebar Structure */
+        .lcars-sidebar-container {
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            margin-right: 1.5rem;
+        }
+
+        .lcars-elbow {
+            height: 80px;
+            width: 100%;
+            background: var(--lcars-primary);
+            border-top-left-radius: 40px;
+        }
+
+        .lcars-main-bar {
+            flex-grow: 1;
+            width: 100%;
+            background: var(--lcars-primary);
+        }
+        
+        .lcars-tail {
+            height: 40px;
+            width: 100%;
+            background: var(--lcars-primary);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .lcars-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .lcars-header {
+            font-family: var(--lcars-header-font);
+            color: var(--lcars-accent);
+            border-bottom: 2px solid var(--lcars-secondary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+
+        /* Accordion styles */
+        .accordion-header {
+            background-color: var(--lcars-secondary);
+            color: var(--lcars-bg);
+            padding: 0.75rem 1.5rem;
+            font-family: var(--lcars-header-font);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-left: 8px solid var(--lcars-accent);
+            margin-top: 1rem;
+        }
+        .accordion-header:hover, .accordion-header.active {
+            background-color: var(--lcars-primary);
+        }
+        .accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            background-color: rgba(30, 30, 40, 0.5);
+            border-left: 2px solid var(--lcars-secondary);
+            margin-left: 8px;
+        }
+        .accordion-content {
+             padding: 1.5rem;
+        }
+        .analogy {
+            background: rgba(0,0,0,0.3);
+            border-left: 4px solid var(--lcars-accent);
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+        
+        /* Visuals for sections */
+        .section-visual {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .visual-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 120px;
+        }
+        .visual-item svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Vertical Flowchart styles */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 0;
+        }
+        .flow-box {
+            background-color: var(--lcars-bg);
+            border: 2px solid var(--lcars-primary);
+            padding: 1rem;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .flow-box:hover {
+            background-color: rgba(156, 130, 212, 0.2);
+            border-color: var(--lcars-accent);
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--lcars-accent);
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--lcars-bg);
+            border: 2px solid var(--lcars-primary);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--lcars-text-dark);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--lcars-accent);
+        }
+        .modal-title {
+            font-family: var(--lcars-header-font);
+            color: var(--lcars-accent);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--lcars-secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        /* LCARS Button Style */
+        .lcars-button {
+            display: inline-block;
+            background-color: var(--lcars-accent);
+            color: var(--lcars-bg);
+            padding: 0.75rem 2rem;
+            font-family: var(--lcars-header-font);
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 2rem;
+            text-align: center;
+            transition: background-color 0.3s;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            border: 2px solid var(--lcars-accent);
+        }
+        .lcars-button:hover {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-accent);
+        }
+
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .lcars-container {
+                flex-direction: column;
+            }
+            .lcars-sidebar-container {
+                flex-direction: row;
+                width: 100%;
+                height: 60px;
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            .lcars-elbow {
+                width: 80px;
+                height: 100%;
+                border-top-left-radius: 30px;
+                border-bottom-left-radius: 30px;
+                border-top-right-radius: 0;
+            }
+            .lcars-main-bar {
+                height: 40px;
+                flex-grow: 1;
+                align-self: flex-end;
+            }
+            .lcars-tail {
+                width: 40px;
+                height: 40px;
+                align-self: flex-end;
+                border-radius: 0;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lcars-container">
+        <!-- LCARS side bar -->
+        <aside class="lcars-sidebar-container">
+            <div class="lcars-elbow"></div>
+            <div class="lcars-main-bar"></div>
+            <div class="lcars-tail"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lcars-content-wrapper">
+            <header class="lcars-header">
+                <h1 class="text-3xl">LNX EDU // MODULE 03</h1>
+                <h2 class="text-xl text-gray-400">SUBJECT: SMART CONTRACTS & AUTOMATION</h2>
+            </header>
+
+            <!-- Accordion Item 1: The 'Why' -->
+            <div>
+                <div class="accordion-header">1.0 // THE "WHY": BEYOND A SIMPLE LEDGER</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <div class="section-visual">
+                            <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-secondary)" stroke-linecap="round" stroke-linejoin="round" d="M16.5 6a3 3 0 0 0-3-3H6.75a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-5.25" /><path stroke="var(--lcars-accent)" d="M15 3.75a2.25 2.25 0 0 1 2.25 2.25v2.25h-4.5V6A2.25 2.25 0 0 1 15 3.75Z" /></svg>
+                                <span>Static Ledger</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-primary)" stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M12 3l-4 4M12 3l4 4" /><path d="M16.5 21a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" stroke="var(--lcars-accent)" /></svg>
+                                <span>Programmable Logic</span>
+                            </div>
+                        </div>
+                        <p class="mb-4">In Module 1, we established that a blockchain is a secure, decentralized ledger. This is revolutionary for storing and verifying data. But what if we could make that data *do things*? What if we could build applications and agreements on top of this trust layer?</p>
+                        <p>Traditional contracts and agreements rely on intermediaries (lawyers, banks, escrow agents) to interpret and enforce the rules. This process is often slow, expensive, and subject to human interpretation and error.</p>
+                        <p>Smart contracts were created to solve this. They ask the question: "Can we embed the rules of an agreement directly into the blockchain, creating a system that enforces itself automatically, without needing a trusted third party?"</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 2: The 'What' -->
+            <div>
+                <div class="accordion-header">2.0 // THE "WHAT": A VENDING MACHINE ON THE BLOCKCHAIN</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <p class="mb-4">A <strong>smart contract is a self-executing agreement</strong> with the terms of the agreement directly written into code. It's a program that runs on the blockchain and automatically executes when specific conditions are met.</p>
+                        <p class="mb-4">Because they live on the blockchain, smart contracts inherit its properties: they are immutable (can't be changed), distributed (can't be shut down), and transparent (anyone can see their code and verify how they work).</p>
+                        <div class="analogy">
+                            <h4 class="font-bold text-white mb-2">SIMPLE ANALOGY: A VENDING MACHINE</h4>
+                            <p>A vending machine is a physical smart contract. It has a set of hardcoded rules: IF you insert the correct amount of money, AND you press the button for a specific item, THEN the machine will automatically dispense that item. There is no need for a cashier to enforce the sale. The logic is built directly into the machine. A smart contract does the same thing with digital assets and actions on the blockchain.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 3: The Three Pillars -->
+            <div>
+                <div class="accordion-header">3.0 // THE PILLARS OF A SMART CONTRACT</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <div class="section-visual">
+                            <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-secondary)" stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-1.621-.871a3 3 0 0 1-.879-2.122v-1.007" /><path stroke="var(--lcars-accent)" stroke-linecap="round" stroke-linejoin="round" d="M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
+                                <span>Deterministic</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-primary)" stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 10.5V6.75a4.5 4.5 0 1 0 9 0v3.75M3.75 19.5h16.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                                <span>Trustless</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-accent)" stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg>
+                                <span>Automated</span>
+                            </div>
+                        </div>
+                         <p class="mb-4">The power of smart contracts comes from these core properties:</p>
+                        <ul class="list-disc list-inside ml-4 mb-4">
+                            <li><strong>Deterministic:</strong> A smart contract will produce the exact same result every time it is given the same input. There is no ambiguity. The code is law.</li>
+                            <li><strong>Trustless:</strong> Because the contract's logic is transparent and its execution is guaranteed by the entire blockchain network, you don't need to trust the person or entity on the other side of the agreement. You only need to trust the code.</li>
+                             <li><strong>Automated:</strong> The contract enforces itself. Once deployed, it runs automatically without any human intervention, reducing the costs and delays associated with manual enforcement.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 4: The 'How' -->
+            <div>
+                <div class="accordion-header">4.0 // THE "HOW": FROM CODE TO EXECUTION</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <h4 class="font-bold text-white mb-2 text-lg">The Smart Contract Lifecycle</h4>
+                        <p>This flowchart shows the life of a smart contract. Click any step for more details.</p>
+                        <div class="flowchart">
+                            <div class="flow-box" data-title="1. Write Code" data-text="A developer writes the logic of the agreement in a specialized programming language like Solidity (for Ethereum) or Rust. This code defines the functions, rules, and states of the contract.">Write Code</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="2. Compile" data-text="The human-readable code (e.g., Solidity) is compiled into 'bytecode.' This is a low-level language that the blockchain's virtual machine (like the EVM on Ethereum) can understand and execute.">Compile to<br>Bytecode</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="3. Deploy to Blockchain" data-text="The developer pays a gas fee to deploy the compiled bytecode to the blockchain. This transaction creates the contract, which now lives permanently at a specific address on the network. It is now immutable.">Deploy on<br>Blockchain</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="4. Interact & Execute" data-text="Users can now 'call' the functions defined in the smart contract by sending transactions to its address. When a function is called with the right inputs, the contract's code executes automatically, changing its state or triggering other actions as defined by its rules.">Users Interact,<br>Contract Executes</div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="education1.html" class="lcars-button">&larr; BACK TO MODULE 1</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="modal-close-btn" class="modal-close">&times;</span>
+            <h3 id="modal-title" class="modal-title"></h3>
+            <p id="modal-text"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const wasActive = this.classList.contains('active');
+
+                    // Close all panels first
+                    accordionHeaders.forEach(h => {
+                        h.classList.remove('active');
+                        h.nextElementSibling.style.maxHeight = null;
+                    });
+
+                    // If the clicked panel was not already open, open it
+                    if (!wasActive) {
+                        this.classList.add('active');
+                        const panel = this.nextElementSibling;
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                    }
+                });
+            });
+
+            // Automatically open the first accordion item on page load
+            if (accordionHeaders.length > 0) {
+                const firstHeader = accordionHeaders[0];
+                firstHeader.classList.add('active');
+                const firstPanel = firstHeader.nextElementSibling;
+                // Use a small timeout to ensure layout is calculated before setting maxHeight
+                setTimeout(() => {
+                    firstPanel.style.maxHeight = firstPanel.scrollHeight + "px";
+                }, 100);
+            }
+
+            // Modal Logic
+            const modal = document.getElementById('info-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const closeBtn = document.getElementById('modal-close-btn');
+            const flowBoxes = document.querySelectorAll('.flow-box');
+
+            flowBoxes.forEach(box => {
+                box.addEventListener('click', function() {
+                    const title = this.getAttribute('data-title');
+                    const text = this.getAttribute('data-text');
+                    
+                    modalTitle.textContent = title;
+                    modalText.textContent = text;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

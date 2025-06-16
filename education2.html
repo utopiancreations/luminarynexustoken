@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LNX EDU | Module 2: DAOs & Governance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* LCARS Cyberpunk Theme v8 - Module 2 */
+        :root {
+            --lcars-bg: #000000;
+            --lcars-primary: #9C82D4; /* Purple */
+            --lcars-secondary: #5C73F2; /* Blue */
+            --lcars-accent: #F29E38; /* Orange */
+            --lcars-text: #E0E0E0;
+            --lcars-header-font: 'Orbitron', sans-serif;
+            --lcars-body-font: 'Roboto Condensed', sans-serif;
+        }
+
+        body {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-text);
+            font-family: var(--lcars-body-font);
+            overflow-x: hidden;
+        }
+
+        .lcars-container {
+            display: flex;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* LCARS Sidebar Structure */
+        .lcars-sidebar-container {
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            margin-right: 1.5rem;
+        }
+
+        .lcars-elbow {
+            height: 80px;
+            width: 100%;
+            background: var(--lcars-primary);
+            border-top-left-radius: 40px;
+        }
+
+        .lcars-main-bar {
+            flex-grow: 1;
+            width: 100%;
+            background: var(--lcars-primary);
+        }
+        
+        .lcars-tail {
+            height: 40px;
+            width: 100%;
+            background: var(--lcars-primary);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .lcars-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .lcars-header {
+            font-family: var(--lcars-header-font);
+            color: var(--lcars-accent);
+            border-bottom: 2px solid var(--lcars-secondary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+
+        /* Accordion styles */
+        .accordion-header {
+            background-color: var(--lcars-secondary);
+            color: var(--lcars-bg);
+            padding: 0.75rem 1.5rem;
+            font-family: var(--lcars-header-font);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-left: 8px solid var(--lcars-accent);
+            margin-top: 1rem;
+        }
+        .accordion-header:hover, .accordion-header.active {
+            background-color: var(--lcars-primary);
+        }
+        .accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            background-color: rgba(30, 30, 40, 0.5);
+            border-left: 2px solid var(--lcars-secondary);
+            margin-left: 8px;
+        }
+        .accordion-content {
+             padding: 1.5rem;
+        }
+        .analogy {
+            background: rgba(0,0,0,0.3);
+            border-left: 4px solid var(--lcars-accent);
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+        }
+        
+        /* Visuals for sections */
+        .section-visual {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .visual-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 120px;
+        }
+        .visual-item svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Vertical Flowchart styles */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 0;
+        }
+        .flow-box {
+            background-color: var(--lcars-bg);
+            border: 2px solid var(--lcars-primary);
+            padding: 1rem;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .flow-box:hover {
+            background-color: rgba(156, 130, 212, 0.2);
+            border-color: var(--lcars-accent);
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--lcars-accent);
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--lcars-bg);
+            border: 2px solid var(--lcars-primary);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--lcars-text-dark);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--lcars-accent);
+        }
+        .modal-title {
+            font-family: var(--lcars-header-font);
+            color: var(--lcars-accent);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--lcars-secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        /* LCARS Button Style */
+        .lcars-button {
+            display: inline-block;
+            background-color: var(--lcars-accent);
+            color: var(--lcars-bg);
+            padding: 0.75rem 2rem;
+            font-family: var(--lcars-header-font);
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 2rem;
+            text-align: center;
+            transition: background-color 0.3s;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            border: 2px solid var(--lcars-accent);
+        }
+        .lcars-button:hover {
+            background-color: var(--lcars-bg);
+            color: var(--lcars-accent);
+        }
+
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .lcars-container {
+                flex-direction: column;
+            }
+            .lcars-sidebar-container {
+                flex-direction: row;
+                width: 100%;
+                height: 60px;
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            .lcars-elbow {
+                width: 80px;
+                height: 100%;
+                border-top-left-radius: 30px;
+                border-bottom-left-radius: 30px;
+                border-top-right-radius: 0;
+            }
+            .lcars-main-bar {
+                height: 40px;
+                flex-grow: 1;
+                align-self: flex-end;
+            }
+            .lcars-tail {
+                width: 40px;
+                height: 40px;
+                align-self: flex-end;
+                border-radius: 0;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lcars-container">
+        <!-- LCARS side bar -->
+        <aside class="lcars-sidebar-container">
+            <div class="lcars-elbow"></div>
+            <div class="lcars-main-bar"></div>
+            <div class="lcars-tail"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lcars-content-wrapper">
+            <header class="lcars-header">
+                <h1 class="text-3xl">LNX EDU // MODULE 02</h1>
+                <h2 class="text-xl text-gray-400">SUBJECT: DAOS & GOVERNANCE</h2>
+            </header>
+
+            <!-- Accordion Item 1: The 'Why' -->
+            <div>
+                <div class="accordion-header">1.0 // THE "WHY": A PROBLEM OF ORGANIZATION</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <div class="section-visual">
+                            <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-secondary)" stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>
+                                <span>Hierarchy</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-accent)" stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                <span>Opacity</span>
+                            </div>
+                        </div>
+                        <p class="mb-4">Traditional organizations, from corporations to non-profits, are built on hierarchy. Decisions are made at the top and passed down. This structure can be effective, but it also has fundamental flaws:</p>
+                        <ul class="list-disc list-inside ml-4 mb-4">
+                            <li><strong>Opacity:</strong> Key decisions and financial transactions often happen behind closed doors. Members or stakeholders may not know how funds are being used or why a certain strategy was chosen.</li>
+                            <li><strong>Misaligned Incentives:</strong> The goals of the leadership may not align with the goals of the members or customers. This can lead to decisions that benefit a few at the expense of the many.</li>
+                            <li><strong>Inefficiency & Bureaucracy:</strong> Rules are enforced by people, leading to slow processes, paperwork, and the potential for human error or bias.</li>
+                        </ul>
+                        <p>DAOs emerged as an experiment to solve these problems by using blockchain technology to create organizations that are more transparent, democratic, and efficient.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 2: The 'What' -->
+            <div>
+                <div class="accordion-header">2.0 // THE "WHAT": AN INTERNET-NATIVE COOPERATIVE</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <p class="mb-4">A <strong>DAO is a Decentralized Autonomous Organization.</strong> It's a community-led entity with no central leadership. Its rules are encoded as computer programs called smart contracts, and it is operated and governed by its members.</p>
+                        <p class="mb-4">Think of it like a digital cooperative. It's an organization that lives on the internet, owned and managed collectively by its members. All decisions, from how to spend funds to what projects to pursue, are made through a transparent, on-chain voting process.</p>
+                        <div class="analogy">
+                            <h4 class="font-bold text-white mb-2">GLOBAL ANALOGY: MEMBER-OWNED CO-OPS</h4>
+                            <p>All over the world, people form cooperatives (or *cooperativas*) to manage resources, from grocery stores in the US to farming co-ops in Latin America. In these organizations, the members are the owners, and they vote on key decisions. A DAO takes this concept and places it on a global, transparent, and automated blockchain framework.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 3: The Three Pillars -->
+            <div>
+                <div class="accordion-header">3.0 // THE PILLARS OF A DAO</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <div class="section-visual">
+                            <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-secondary)" stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" /></svg>
+                                <span>Smart Contracts</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-primary)" stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 3a9 9 0 1 1-18 0" /></svg>
+                                <span>Governance Tokens</span>
+                            </div>
+                             <div class="visual-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke="var(--lcars-accent)" stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>
+                                <span>Treasury</span>
+                            </div>
+                        </div>
+                         <p class="mb-4">DAOs are built on three fundamental components:</p>
+                        <ul class="list-disc list-inside ml-4 mb-4">
+                            <li><strong>Smart Contracts:</strong> These are the backbone of the DAO. They are self-executing programs that contain the organization's rules. They define how voting works, how funds can be spent, and what actions are permissible. Because they live on the blockchain, these rules are transparent and cannot be changed without a community vote.</li>
+                            <li><strong>Governance Tokens:</strong> To become a member and have voting rights, you typically need to hold the DAO's specific cryptocurrency, or "governance token." Often, one token equals one vote. These tokens represent a share of ownership and influence in the organization.</li>
+                             <li><strong>Treasury:</strong> This is the DAO's collective bank account, also controlled by smart contracts. No single person can access these funds. The only way to spend money from the treasury is to create a formal proposal, have it approved by a member vote, and then the smart contract will automatically execute the payment.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 4: The 'How' -->
+            <div>
+                <div class="accordion-header">4.0 // THE "HOW": DAO OPERATIONS IN ACTION</div>
+                <div class="accordion-panel">
+                    <div class="accordion-content">
+                        <h4 class="font-bold text-white mb-2 text-lg">The Proposal Lifecycle</h4>
+                        <p>This flowchart shows how decisions are made in a typical DAO. Click any step for more details.</p>
+                        <div class="flowchart">
+                            <div class="flow-box" data-title="1. Proposal Creation" data-text="A DAO member identifies a need or opportunity—for example, funding a new project, changing a rule, or hiring a contributor. They draft a formal proposal outlining the 'what' and 'why', and submit it on-chain for the community to see.">Proposal<br>Created</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="2. Community Discussion" data-text="The proposal is shared on community forums (like Discord or Discourse). Members debate the merits, suggest improvements, and ask questions. This off-chain discussion is crucial for building consensus before a formal vote.">Community<br>Discussion</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="3. On-Chain Voting" data-text="The proposal is moved to a formal vote. Members use their governance tokens to vote 'For,' 'Against,' or 'Abstain.' The voting period is a fixed duration (e.g., 3-7 days) defined in the smart contract.">On-Chain<br>Voting Period</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="4. Quorum & Outcome" data-text="For a vote to be valid, it must meet 'quorum'—a minimum number of total votes cast. If the vote passes (e.g., more 'For' than 'Against') and meets quorum, the proposal is approved. If not, it fails.">Vote Outcome<br>Determined</div>
+                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-box" data-title="5. Execution" data-text="If the proposal passes, its terms are executed automatically by the smart contract. If the vote was to send funds, the treasury releases the crypto. If it was to change a rule, the governing smart contract is updated. This action is irreversible.">Proposal Executed<br>on Blockchain</div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="education3.html" class="lcars-button">PROCEED TO NEXT MODULE &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="modal-close-btn" class="modal-close">&times;</span>
+            <h3 id="modal-title" class="modal-title"></h3>
+            <p id="modal-text"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const wasActive = this.classList.contains('active');
+
+                    // Close all panels first
+                    accordionHeaders.forEach(h => {
+                        h.classList.remove('active');
+                        h.nextElementSibling.style.maxHeight = null;
+                    });
+
+                    // If the clicked panel was not already open, open it
+                    if (!wasActive) {
+                        this.classList.add('active');
+                        const panel = this.nextElementSibling;
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                    }
+                });
+            });
+
+            // Automatically open the first accordion item on page load
+            if (accordionHeaders.length > 0) {
+                const firstHeader = accordionHeaders[0];
+                firstHeader.classList.add('active');
+                const firstPanel = firstHeader.nextElementSibling;
+                // Use a small timeout to ensure layout is calculated before setting maxHeight
+                setTimeout(() => {
+                    firstPanel.style.maxHeight = firstPanel.scrollHeight + "px";
+                }, 100);
+            }
+
+            // Modal Logic
+            const modal = document.getElementById('info-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const closeBtn = document.getElementById('modal-close-btn');
+            const flowBoxes = document.querySelectorAll('.flow-box');
+
+            flowBoxes.forEach(box => {
+                box.addEventListener('click', function() {
+                    const title = this.getAttribute('data-title');
+                    const text = this.getAttribute('data-text');
+                    
+                    modalTitle.textContent = title;
+                    modalText.textContent = text;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
