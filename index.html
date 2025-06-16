@@ -16,7 +16,15 @@
             font-family: 'Inter', sans-serif;
             background-color: #0a0a0a;
             color: #e5e5e5;
-            overflow-x: hidden; /* Prevent horizontal scroll on body */
+            overflow: hidden; /* Hide scrollbars during welcome */
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            background-color: #0a0a0a;
+            margin: 0;
+            padding: 0;
         }
 
         /* Interactive Grid Background */
@@ -48,6 +56,7 @@
             background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--spotlight-color) 0%, transparent 40%);
             z-index: -1;
             pointer-events: none; /* Allows clicks to pass through */
+            opacity: 0.8; /* Slightly reduce intensity for better readability */
         }
 
         @keyframes pan-grid {
@@ -176,6 +185,7 @@
             </div>
         </div>
 
+
         <!-- Navigation Grid -->
         <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             
@@ -274,78 +284,88 @@
 
             // --- Interactive Background Logic ---
             const container = document.querySelector('.main-container');
-            if (container) {
-                container.addEventListener('mousemove', e => {
-                    const rect = container.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    container.style.setProperty('--mouse-x', `${x}px`);
-                    container.style.setProperty('--mouse-y', `${y}px`);
-                });
+            
+            // Initialize spotlight position to center of screen
+            function initializeSpotlight() {
+                const rect = container.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                container.style.setProperty('--mouse-x', `${centerX}px`);
+                container.style.setProperty('--mouse-y', `${centerY}px`);
             }
+            
+            // Set initial position immediately
+            initializeSpotlight();
+            
+            // Also update on window resize
+            window.addEventListener('resize', initializeSpotlight);
+            
+            container.addEventListener('mousemove', e => {
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                container.style.setProperty('--mouse-x', `${x}px`);
+                container.style.setProperty('--mouse-y', `${y}px`);
+            });
 
             // --- Status Ticker Logic ---
             const tickerContent = document.getElementById('ticker-content');
-            if (tickerContent) {
-                const tickerItems = [
-                    { label: 'SYSTEM STATUS', value: 'NOMINAL', color: 'text-green-400' },
-                    { label: 'DAO TREASURY', value: '942,500,000 LNX', color: 'text-sky-400' },
-                    { label: 'ACTIVE BOUNTIES', value: '17', color: 'text-yellow-400' },
-                    { label: 'ETHICS BOARD', value: 'ONLINE', color: 'text-green-400' },
-                    { label: 'LAST DAO VOTE', value: 'PASSED (91% MAJORITY)', color: 'text-teal-400' },
-                    { label: 'COMMUNITY MEMBERS', value: '42', color: 'text-indigo-400' }
-                ];
-                
-                const allItems = [...tickerItems, ...tickerItems];
-                tickerContent.innerHTML = allItems.map(item => `<div class="ticker-item"><span class="text-neutral-500">${item.label}:</span> <span class="${item.color}">${item.value}</span></div>`).join('');
-                
-                let scrollX = 0;
-                function animateTicker() {
-                    scrollX -= 1;
-                    const firstItemWidth = tickerContent.children[0]?.offsetWidth || 0;
-                    if (scrollX <= -firstItemWidth) {
-                        scrollX += firstItemWidth;
-                        tickerContent.appendChild(tickerContent.children[0]);
-                    }
-                    tickerContent.style.transform = `translateX(${scrollX}px)`;
-                    requestAnimationFrame(animateTicker);
+            const tickerItems = [
+                { label: 'SYSTEM STATUS', value: 'NOMINAL', color: 'text-green-400' },
+                { label: 'DAO TREASURY', value: '942,500,000 LNX', color: 'text-sky-400' },
+                { label: 'ACTIVE BOUNTIES', value: '17', color: 'text-yellow-400' },
+                { label: 'ETHICS BOARD', value: 'ONLINE', color: 'text-green-400' },
+                { label: 'LAST DAO VOTE', value: 'PASSED (91% MAJORITY)', color: 'text-teal-400' },
+                { label: 'COMMUNITY MEMBERS', value: '42', color: 'text-indigo-400' }
+            ];
+            
+            // Duplicate items to ensure smooth looping
+            const allItems = [...tickerItems, ...tickerItems];
+            tickerContent.innerHTML = allItems.map(item => `<div class="ticker-item"><span class="text-neutral-500">${item.label}:</span> <span class="${item.color}">${item.value}</span></div>`).join('');
+            
+            let scrollX = 0;
+            function animateTicker() {
+                scrollX -= 1;
+                const firstItemWidth = tickerContent.children[0].offsetWidth;
+                if (scrollX <= -firstItemWidth) {
+                    scrollX += firstItemWidth;
+                    tickerContent.appendChild(tickerContent.children[0]);
                 }
-                animateTicker();
+                tickerContent.style.transform = `translateX(${scrollX}px)`;
+                requestAnimationFrame(animateTicker);
             }
+            animateTicker();
 
             // --- Terminal Logic ---
             const terminal = document.getElementById('terminal');
             const title = document.getElementById('main-title');
             const terminalOutput = document.getElementById('terminal-output');
             const terminalPrompt = document.getElementById('terminal-prompt');
-            if (terminal && title && terminalOutput && terminalPrompt) {
-                title.addEventListener('click', () => {
-                    if (terminal.style.height === '50%') {
-                        terminal.style.height = '0';
-                    } else {
-                        terminal.style.height = '50%';
-                        terminalPrompt.focus();
-                        printToTerminal("Luminary Nexus Terminal v0.1. Type 'help' for a list of commands.");
-                    }
-                });
 
-                terminalPrompt.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') {
-                        const command = terminalPrompt.value.trim().toLowerCase();
-                        printToTerminal(`> ${command}`);
-                        handleCommand(command);
-                        terminalPrompt.value = '';
-                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                    }
-                });
-            }
+            title.addEventListener('click', () => {
+                if (terminal.style.height === '50%') {
+                    terminal.style.height = '0';
+                } else {
+                    terminal.style.height = '50%';
+                    terminalPrompt.focus();
+                    printToTerminal("Luminary Nexus Terminal v0.1. Type 'help' for a list of commands.");
+                }
+            });
+
+            terminalPrompt.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    const command = terminalPrompt.value.trim().toLowerCase();
+                    printToTerminal(`> ${command}`);
+                    handleCommand(command);
+                    terminalPrompt.value = '';
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                }
+            });
 
             function printToTerminal(text) {
-                if (terminalOutput) {
-                    const p = document.createElement('p');
-                    p.innerHTML = text.replace(/ /g, '&nbsp;'); // Preserve spacing
-                    terminalOutput.appendChild(p);
-                }
+                const p = document.createElement('p');
+                p.innerHTML = text.replace(/ /g, '&nbsp;'); // Preserve spacing
+                terminalOutput.appendChild(p);
             }
 
             function handleCommand(cmd) {
@@ -374,7 +394,7 @@
                         printToTerminal("Welcome animation reset. <span class='text-yellow-400'>Reload the page to see it again.</span>");
                         break;
                     case 'exit':
-                        if (terminal) terminal.style.height = '0';
+                        terminal.style.height = '0';
                         break;
                     default:
                         printToTerminal(`Command not found: ${cmd}. Type 'help' for a list of commands.`);
