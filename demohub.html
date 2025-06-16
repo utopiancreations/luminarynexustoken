@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminary Nexus - Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grid-color: rgba(55, 65, 81, 0.4);
+            --bg-color: #030712;
+            --pane-bg: rgba(17, 24, 39, 0.8);
+            --pane-border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #f3f4f6;
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .font-mono { font-family: 'Share Tech Mono', monospace; }
+        .glass-pane {
+            background-color: var(--pane-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--pane-border);
+            border-radius: 1rem;
+        }
+        .view {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            will-change: opacity;
+        }
+        .view.active {
+            display: block;
+            opacity: 1;
+        }
+        .progress-bar-bg { background-color: rgba(255, 255, 255, 0.1); }
+        .progress-bar-fill { transition: width 0.5s ease-in-out; }
+        
+        .tab-button {
+            transition: background-color 0.2s, color 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button.active {
+            color: #2dd4bf; /* teal-400 */
+            border-bottom-color: #2dd4bf;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-7xl mx-auto w-full">
+        <!-- Main Hub View -->
+        <div id="hub-view" data-view="hub" class="view">
+            <!-- Header Section -->
+            <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">Nexus Hub</h1>
+                    <p class="text-lg text-neutral-400 font-mono">Welcome, Joshua Miller</p>
+                </div>
+                <div class="font-mono text-right mt-4 sm:mt-0">
+                    <p id="date" class="text-lg"></p>
+                    <p id="time" class="text-xl text-teal-400"></p>
+                </div>
+            </header>
+
+            <!-- At-a-glance Widgets -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="glass-pane p-4 flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg><div><p class="font-bold text-lg">68°F</p><p class="text-neutral-300 text-sm">Partly Cloudy</p></div></div>
+                <div class="glass-pane p-4 flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-indigo-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg><div><p class="font-mono text-indigo-300 text-lg">12,540.88</p><p class="text-neutral-400 text-sm">LNX Balance</p></div></div>
+                <div class="glass-pane p-4"><div><p class="font-bold text-lg">Contribution</p><div class="w-full progress-bar-bg rounded-full h-2 mt-1"><div class="bg-teal-500 h-2 rounded-full" style="width: 82%"></div></div><p class="text-xs text-neutral-400 mt-1">8.2 / 10 hrs this week</p></div></div>
+                <div class="glass-pane p-4"><div><p class="font-bold text-lg">Resources</p><div class="w-full progress-bar-bg rounded-full h-2 mt-1"><div class="bg-green-500 h-2 rounded-full" style="width: 95%"></div></div><p class="text-xs text-neutral-400 mt-1">Energy Surplus: +5%</p></div></div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="glass-pane p-2 mb-6">
+                <div id="main-tabs" class="flex items-center justify-around">
+                    <button class="hub-tab-button tab-button active font-bold py-2 px-4" data-tab="dashboard">Dashboard</button>
+                    <button class="hub-tab-button tab-button font-bold py-2 px-4" data-tab="bounties">Bounties</button>
+                    <button class="hub-tab-button tab-button font-bold py-2 px-4" data-tab="research">Research</button>
+                    <button class="hub-tab-button tab-button font-bold py-2 px-4" data-tab="education">Education</button>
+                </div>
+            </div>
+
+            <!-- Tab Content Area -->
+            <div id="tab-content-area">
+                <!-- Content will be injected by JS -->
+            </div>
+        </div>
+
+        <!-- Detail Views (initially hidden) -->
+        <div id="bounty-detail-view" data-view="bounty-detail" class="view"></div>
+        <div id="role-detail-view" data-view="role-detail" class="view"></div>
+        <div id="research-detail-view" data-view="research-detail" class="view"></div>
+        <div id="lesson-list-view" data-view="lesson-list" class="view"></div>
+        <div id="lesson-detail-view" data-view="lesson-detail" class="view"></div>
+    </div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- MOCK DATA ---
+    const mockBounties = [
+        { id: 1, title: "Optimize Mycelium Pod Climate Control", tags: ["Agriculture", "Tech"], reward: 1500, roles: [{ id: 101, title: "Data Analyst", reward: 700, description: "Analyze historical climate data to identify patterns for energy optimization.", tasks: ["Clean sensor data logs.", "Develop predictive model for temp.", "Generate report."] },{ id: 102, title: "IoT Technician", reward: 800, description: "Implement and test new sensor logic based on the analyst's findings.", tasks: ["Update sensor firmware.", "Calibrate new thresholds.", "Monitor system for 48 hours."] }] },
+        { id: 2, title: "Community Commons Event Planning", tags: ["Community", "Social"], reward: 500, roles: [{ id: 201, title: "Event Coordinator", reward: 500, description: "Organize the upcoming Summer Solstice celebration.", tasks: ["Book musical talent via Hub.", "Coordinate with Kitchen Pod.", "Submit final plan to DAO."] }] },
+        { id: 3, title: "Develop 'Challenge the Course' Feature", tags: ["Education", "Dev"], reward: 2500, roles: [{ id: 301, title: "Frontend Developer", reward: 1200, description: "Build the user interface for the course challenge exam.", tasks: ["Create UI components.", "Integrate with auth.", "Ensure mobile responsiveness."] }, { id: 302, title: "Backend Developer", reward: 1300, description: "Develop the API for fetching questions and submitting results.", tasks: ["Design DB schema.", "Create secure API.", "Write unit tests."] }] }
+    ];
+    const mockResearch = [
+        { id: 1, title: "Mycelium as a Building Material", status: "Active", team: ["Anna", "Ben", "Charlie"], goal: "Develop a viable, load-bearing construction block using locally grown mycelium.", timeline: "12 Months" },
+        { id: 2, title: "Long-Term AI Cognitive Architectures", status: "Proposed", team: [], goal: "Explore non-transformer based AI models for long-term reasoning and memory retention.", timeline: "24 Months+" },
+        { id: 3, title: "Closed-Loop Greywater Filtration with Native Plants", status: "Active", team: ["Diana", "Eve"], goal: "Achieve 95% water reclamation for agricultural use through a gravity-fed botanical filtration system.", timeline: "6 Months" }
+    ];
+    const mockEducation = {
+        categories: [
+            { id: 'tech', name: 'Technology & Engineering', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>' },
+            { id: 'agri', name: 'Sustainable Agriculture', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h8a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.832 15.172l.001-.001M11.168 15.172l.001-.001M14.5 15.172l.001-.001" /></svg>' },
+            { id: 'gov', name: 'DAO Governance', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>' }
+        ],
+        lessons: {
+            'tech': [ { id: 't101', title: 'Intro to Solidity', completed: true, summary: "Learn the fundamentals of the Solidity programming language." }, { id: 't102', title: 'Microgrid Maintenance 101', completed: false, summary: "Understand our community's energy grid." } ],
+            'agri': [ { id: 'a101', title: 'Mycology: Basic Culturing', completed: true, summary: "An introduction to sterile environments for cultivating mushroom species." }, { id: 'a102', title: 'Vertical Farming Automation', completed: true, summary: "Troubleshoot automated irrigation and lighting systems." } ],
+            'gov': [ { id: 'g101', title: 'Writing an Effective DAO Proposal', completed: false, summary: "Learn to structure a compelling proposal for community voting." } ]
+        }
+    };
+    
+    // --- APP STATE & NAVIGATION ---
+    const appState = {
+        currentView: 'hub',
+        activeTab: 'dashboard',
+        history: [{view: 'hub', tab: 'dashboard', params: {}}],
+        params: {}
+    };
+
+    function navigate(view, params = {}) {
+        const lastState = appState.history[appState.history.length - 1];
+        if (lastState.view !== view || JSON.stringify(lastState.params) !== JSON.stringify(params)) {
+             appState.history.push({ view, params: params, tab: appState.activeTab });
+        }
+        appState.currentView = view;
+        appState.params = params;
+        renderApp();
+    }
+    
+    function navigateBack() {
+        if (appState.history.length > 1) {
+            appState.history.pop();
+            const lastState = appState.history[appState.history.length - 1];
+            appState.currentView = lastState.view;
+            appState.params = lastState.params;
+            appState.activeTab = lastState.tab;
+            renderApp();
+        }
+    }
+    
+    // --- UTILITIES ---
+    function updateClock() {
+        const dateEl = document.getElementById('date');
+        const timeEl = document.getElementById('time');
+        if (dateEl && timeEl) {
+            const now = new Date();
+            dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            timeEl.textContent = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+
+    function createHeader(title) {
+        return `<header class="flex justify-between items-center mb-8"><h1 class="text-3xl md:text-4xl font-bold tracking-tight">${title}</h1><div class="flex items-center gap-2"><button class="back-button p-2 rounded-lg hover:bg-neutral-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg></button><button class="home-button p-2 rounded-lg hover:bg-neutral-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-400" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg></button></div></header>`;
+    }
+    
+    // --- RENDER FUNCTIONS ---
+    function renderApp() {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        const viewContainer = document.getElementById(`${appState.currentView}-view`);
+        if (!viewContainer) return;
+
+        let content = null;
+        if (appState.currentView !== 'hub') {
+            content = renderDetailView(appState.currentView, appState.params);
+        } else {
+            renderTabView(appState.activeTab);
+        }
+        
+        if (content !== null) {
+            viewContainer.innerHTML = content;
+        }
+        
+        viewContainer.classList.add('active');
+        updateActiveTab();
+    }
+
+    function renderTabView(tabId) {
+        const tabContentArea = document.getElementById('tab-content-area');
+        if (!tabContentArea) return;
+        
+        let content = '';
+        switch(tabId) {
+            case 'dashboard': content = renderDashboardTab(); break;
+            case 'bounties': content = renderBountiesTab(); break;
+            case 'research': content = renderResearchTab(); break;
+            case 'education': content = renderEducationTab(); break;
+        }
+        tabContentArea.innerHTML = content;
+        appState.activeTab = tabId;
+        updateActiveTab();
+    }
+    
+    function updateActiveTab() {
+        document.querySelectorAll('.hub-tab-button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === appState.activeTab);
+        });
+    }
+
+    function renderBounties() {
+        const container = document.getElementById('bounty-board');
+        if (!container) return;
+        container.innerHTML = mockBounties.map(bounty => `<button class="bounty-button w-full text-left p-4 rounded-lg hover:bg-neutral-800 transition border border-transparent hover:border-neutral-700" data-bounty-id="${bounty.id}">${bounty.isAISuggestion ? `<div class="flex items-center gap-2 mb-1 text-sm font-mono text-fuchsia-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>AI SUGGESTION</div>` : ''}<h3 class="font-bold text-lg">${bounty.title}</h3><div class="flex items-center justify-between mt-2"><div class="flex gap-2">${bounty.tags.map(tag => `<span class="text-xs font-medium bg-neutral-700 text-neutral-300 px-2 py-1 rounded">${tag}</span>`).join('')}</div><span class="font-mono text-amber-400 font-semibold">${bounty.reward} LNX</span></div></button>`).join('');
+    }
+
+    // --- TAB CONTENT RENDERERS ---
+    function renderDashboardTab() {
+        return `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-pane p-6">
+                <h2 class="text-xl font-bold mb-4">DAO Governance</h2>
+                <div class="space-y-4">
+                    <div><p class="text-neutral-400">Active Vote:</p><p class="font-semibold">Ratify Q3 Budget for Agri-Pods</p><p class="text-sm text-yellow-400">Voting ends in 2 days</p></div>
+                    <button class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-lg transition">Vote Now</button>
+                </div>
+            </div>
+            <div class="glass-pane p-6 bg-fuchsia-500/10 border-fuchsia-500/30">
+                <h2 class="text-xl font-bold mb-4 text-fuchsia-300">AI Collaboration Suggestion</h2>
+                <p class="text-neutral-300">The Nexus AI has identified a 92% workflow overlap between your current psilocybin research and the Mycology Pod's sterile culturing techniques.</p>
+                <button class="bounty-button mt-4 w-full bg-fuchsia-600/50 hover:bg-fuchsia-600/80 text-white font-bold py-2 px-4 rounded-lg transition" data-bounty-id="4">View Suggested Bounty</button>
+            </div>
+        </div>`;
+    }
+    function renderBountiesTab() { return `<div id="bounty-list" class="space-y-4">${mockBounties.map(bounty => `<button class="bounty-button w-full text-left p-4 rounded-lg glass-pane hover:border-teal-400/50" data-bounty-id="${bounty.id}"><h3 class="font-bold text-lg">${bounty.title}</h3><div class="flex items-center justify-between mt-2"><div class="flex gap-2">${bounty.tags.map(tag => `<span class="text-xs font-medium bg-neutral-700 text-neutral-300 px-2 py-1 rounded">${tag}</span>`).join('')}</div><span class="font-mono text-amber-400 font-semibold">${bounty.reward} LNX</span></div></button>`).join('')}</div>`; }
+    function renderResearchTab() { return `<div id="research-list" class="space-y-4">${mockResearch.map(p => `<button class="research-button w-full text-left p-4 rounded-lg glass-pane hover:border-sky-400/50" data-research-id="${p.id}"><div class="flex justify-between items-start"><h3 class="font-bold text-lg">${p.title}</h3><span class="text-xs font-semibold ${p.status === 'Active' ? 'text-green-400' : 'text-yellow-400'}">${p.status}</span></div><p class="text-sm text-neutral-400 mt-2">Goal: ${p.goal}</p></button>`).join('')}</div>`; }
+    function renderEducationTab() { return `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${mockEducation.categories.map(cat => `<button class="category-card glass-pane p-6 text-left hover:border-indigo-400/50 transition-all duration-300 transform hover:-translate-y-1" data-category-id="${cat.id}"><div class="flex items-center gap-4"><div class="p-3 bg-neutral-700 rounded-lg text-indigo-400">${cat.icon}</div><h3 class="text-xl font-bold">${cat.name}</h3></div></button>`).join('')}</div>`; }
+
+    // --- DETAIL VIEW RENDERERS ---
+    function renderDetailView(viewId, params) {
+        let content = '';
+        switch(viewId) {
+            // ... all your detail view cases from previous version ...
+            case 'bounty-detail':
+                const bounty = mockBounties.find(b => b.id == params.bountyId);
+                content = `${createHeader(bounty.title)}<div class="glass-pane p-6"><div class="flex items-center justify-between mb-6"><div class="flex gap-2">${bounty.tags.map(tag => `<span class="text-sm font-medium bg-neutral-700 text-neutral-300 px-2 py-1 rounded">${tag}</span>`).join('')}</div><span class="font-mono text-amber-400 text-lg font-semibold">Total Reward: ${bounty.reward} LNX</span></div><h3 class="text-lg font-semibold mb-4 border-b border-neutral-700 pb-2">Available Roles</h3><div class="space-y-3">${bounty.roles.map(role => `<button class="role-button w-full text-left p-4 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition" data-bounty-id="${bounty.id}" data-role-id="${role.id}"><div class="flex justify-between items-center"><span class="font-bold text-teal-400">${role.title}</span><span class="font-mono text-amber-400">${role.reward} LNX</span></div><p class="text-neutral-400 mt-1">${role.description}</p></button>`).join('')}</div></div>`;
+                break;
+            case 'role-detail':
+                 const b = mockBounties.find(b => b.id == params.bountyId);
+                 const role = b?.roles.find(r => r.id == params.roleId);
+                 content = `${createHeader(role.title)}<div class="glass-pane p-6"><p class="text-neutral-400 mb-4">From Bounty: ${b.title}</p><div class="flex justify-between items-center mb-6 border-b border-neutral-700 pb-4"><span class="font-bold text-lg">Role Reward</span><span class="font-mono text-amber-400 text-xl font-semibold">${role.reward} LNX</span></div><h3 class="text-lg font-semibold mb-2">Detailed Tasks</h3><ul class="list-disc list-inside space-y-2 text-neutral-300 mb-6">${role.tasks.map(task => `<li>${task}</li>`).join('')}</ul><button class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-4 rounded-lg transition">Commit to this Role</button></div>`;
+                break;
+            case 'research-detail':
+                const project = mockResearch.find(p => p.id == params.researchId);
+                content = `${createHeader(project.title)}<div class="glass-pane p-6"><div class="mb-6"><h3 class="text-lg font-semibold">Status</h3><p class="${project.status === 'Active' ? 'text-green-400' : 'text-yellow-400'} font-bold">${project.status}</p></div><div class="mb-6"><h3 class="text-lg font-semibold">Goal</h3><p class="text-neutral-300">${project.goal}</p></div><div class="mb-6"><h3 class="text-lg font-semibold">Team</h3><p class="text-neutral-300">${project.team.join(', ') || 'Recruiting'}</p></div><button class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg transition">Join Research Team</button></div>`;
+                break;
+             case 'lesson-list':
+                const category = mockEducation.categories.find(c => c.id === params.categoryId);
+                const lessons = mockEducation.lessons[params.categoryId];
+                content = `${createHeader(category.name)}<div class="glass-pane p-6"><div class="space-y-4">${lessons.map(lesson => `<button class="lesson-card w-full text-left p-4 rounded-lg flex items-center justify-between hover:bg-neutral-800 transition border border-transparent hover:border-neutral-700" data-category-id="${params.categoryId}" data-lesson-id="${lesson.id}"><div><h3 class="font-bold text-lg">${lesson.title}</h3><p class="text-neutral-400 text-sm">${lesson.summary}</p></div>${lesson.completed ? `<div class="flex-shrink-0 flex items-center gap-2 text-green-400 font-semibold ml-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>Completed</div>` : ''}</button>`).join('')}</div></div>`;
+                break;
+            case 'lesson-detail':
+                const l = mockEducation.lessons[params.categoryId].find(l => l.id === params.lessonId);
+                content = `${createHeader(l.title)}<div class="glass-pane p-6"><p class="text-neutral-400 mb-6">${l.summary}</p><div class="bg-neutral-900 p-4 rounded-lg mb-6"><h4 class="font-semibold text-lg mb-2">Learning Objectives</h4><ul class="list-disc list-inside space-y-1 text-neutral-300"><li>Objective A: Understand core concepts.</li><li>Objective B: Apply knowledge in practical scenarios.</li><li>Objective C: Analyze and troubleshoot common issues.</li></ul></div><div class="flex flex-col sm:flex-row gap-4"><button class="flex-1 bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-4 rounded-lg transition text-center">Begin Lesson</button><button class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-lg transition text-center">Challenge the Course</button></div><p class="text-xs text-center text-neutral-500 mt-4">Pass the challenge exam with 90% or higher to earn the completion badge.</p></div>`;
+                break;
+        }
+        return content;
+    }
+
+    // --- EVENT LISTENERS ---
+    document.body.addEventListener('click', (e) => {
+        let targetElement = e.target;
+        while (targetElement && targetElement !== document.body) {
+            if (targetElement.matches('.hub-tab-button')) { renderTabView(targetElement.dataset.tab); return; }
+            if (targetElement.matches('.bounty-button')) { navigate('bounty-detail', {bountyId: targetElement.dataset.bountyId}); return; }
+            if (targetElement.matches('.role-button')) { navigate('role-detail', {bountyId: targetElement.dataset.bountyId, roleId: targetElement.dataset.roleId}); return; }
+            if (targetElement.matches('.research-button')) { navigate('research-detail', {researchId: targetElement.dataset.researchId}); return; }
+            if (targetElement.matches('.nav-button')) { navigate('hub', {tab: targetElement.dataset.viewTarget}); appState.activeTab = targetElement.dataset.viewTarget; renderApp(); return; }
+            if (targetElement.matches('.category-card')) { navigate('lesson-list', {categoryId: targetElement.dataset.categoryId}); return; }
+            if (targetElement.matches('.lesson-card')) { navigate('lesson-detail', {categoryId: targetElement.dataset.categoryId, lessonId: targetElement.dataset.lessonId}); return; }
+            if (targetElement.matches('.home-button')) { navigateHome(); return; }
+            if (targetElement.matches('.back-button')) { navigateBack(); return; }
+            targetElement = targetElement.parentElement;
+        }
+    });
+
+    // --- INITIALIZATION ---
+    updateClock();
+    setInterval(updateClock, 1000);
+    renderApp();
+    
+    const ticker = document.getElementById('ticker-content');
+    if (ticker && !ticker.dataset.initialized) {
+        ticker.dataset.initialized = "true";
+        const parent = ticker.parentElement;
+        if (parent && parent.scrollWidth > parent.clientWidth) {
+            const contentWidth = ticker.scrollWidth;
+            ticker.innerHTML += ticker.innerHTML; 
+            let position = 0;
+            function animateTicker() {
+                position--;
+                if (position < -contentWidth) { position = 0; }
+                ticker.style.transform = `translateX(${position}px)`;
+                requestAnimationFrame(animateTicker);
+            }
+            requestAnimationFrame(animateTicker);
+        }
+    }
+});
+</script>
+</body>
+</html>
