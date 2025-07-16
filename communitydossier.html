@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminary Nexus - Community Systems Dossier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grid-color: rgba(55, 65, 81, 0.4);
+            --bg-color: #030712;
+            --pane-bg: rgba(17, 24, 39, 0.8);
+            --pane-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #2dd4bf; /* teal-400 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #f3f4f6;
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .font-mono { font-family: 'Share Tech Mono', monospace; }
+        .glass-pane {
+            background-color: var(--pane-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--pane-border);
+            border-radius: 1rem;
+        }
+        .content-section {
+            scroll-margin-top: 80px; /* Offset for sticky nav */
+        }
+        .sticky-nav a.active {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-7xl mx-auto w-full">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-sky-400 to-indigo-500">Community Systems Dossier</h1>
+            <p class="text-lg text-neutral-400 mt-2 font-mono">Version 2.0: Human-Centered Design & Policy</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sticky Navigation -->
+            <aside class="lg:w-1/4 lg:sticky top-8 self-start">
+                <nav id="dossier-nav" class="glass-pane p-4">
+                    <h2 class="font-bold text-lg mb-4 px-3">Dossier Index</h2>
+                    <ul class="space-y-2 font-mono">
+                        <li><a href="#sizing" class="block px-3 py-2 rounded-md hover:bg-neutral-700 transition">Community Sizing</a></li>
+                        <li><a href="#passport" class="block px-3 py-2 rounded-md hover:bg-neutral-700 transition">Utopia Passport System</a></li>
+                        <li><a href="#transport" class="block px-3 py-2 rounded-md hover:bg-neutral-700 transition">Nexus Transport Enterprise</a></li>
+                        <li><a href="#marketplace" class="block px-3 py-2 rounded-md hover:bg-neutral-700 transition">Marketplace Framework</a></li>
+                        <li><a href="#governance" class="block px-3 py-2 rounded-md hover:bg-neutral-700 transition">Advanced DAO Governance</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="lg:w-3/4 space-y-12">
+                <!-- Sizing Section -->
+                <section id="sizing" class="content-section glass-pane p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-4 tracking-tight border-b-2 border-teal-500/50 pb-2">Community Sizing Hypothesis</h2>
+                    <p class="text-neutral-400 mb-6">Our growth model prioritizes social cohesion over raw numbers, using a networked approach to balance intimacy with diversity.</p>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Phase 1: The Pioneer Group (30-50 Members)</h3>
+                            <p>The smallest viable community size. Large enough for a diverse skill set to establish core food and energy systems, yet small enough for deep trust and rapid, informal decision-making. The primary challenge at this stage is mitigating groupthink; hence, the <a href="questionnaire.html" class="underline hover:text-teal-400">Values-Alignment Questionnaire</a> is critical for selecting pioneers committed to radical acceptance.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Phase 2: The Dunbar Unit (100-150 Members)</h3>
+                            <p>The optimal size for a single, stable community, based on Dunbar's Number. This size supports a rich social fabric, preventing the claustrophobia of smaller groups while maintaining a high-trust environment where everyone is known. Formal systems like the DAO and conflict resolution frameworks become essential to manage increased social complexity.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Phase 3: The Networked Civilization (Scaling Out, Not Up)</h3>
+                            <p>To achieve greater diversity and scale, we will not grow a single community beyond the Dunbar limit. Instead, we will replicate successful communities, creating a "fractal" network of interconnected 150-person units. These independent communities are united by the global Luminary Nexus DAO, the Passport system, and a shared set of core values, offering the best of both small-town intimacy and global-network diversity.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Passport Section -->
+                <section id="passport" class="content-section glass-pane p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-4 tracking-tight border-b-2 border-teal-500/50 pb-2">The Utopia Passport & Travel Coin System</h2>
+                    <p class="text-neutral-400 mb-6">A system designed to make inter-community travel an effortless, equitable, and celebrated right of membership, fostering a truly interconnected network.</p>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Travel Coins: A Non-Financial Currency</h3>
+                            <p>Members receive an annual, non-transferable allotment of Travel Coins. These are used to "pay" for stays in other communities. The cost is dynamic, based on demand, ensuring fair access to all locations. This prevents desirable "destination" communities from being monopolized.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">The "Living Bounty Contract": Flexible Rewards</h3>
+                            <p>Members completing bounties can choose their reward (LNX or Travel Coins). They can change their preference at any time before the bounty is complete, allowing for flexibility as personal needs change during long-term projects.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">The "Sponsored Journey": Compassionate Gifting</h3>
+                            <p>Members can use their own Travel Coins to gift a specific trip to another member. This creates a non-transferable "Gifted Journey Ticket," allowing for acts of kindness without creating a secondary market. To prevent social friction, if the recipient declines the gift, cannot take the trip, or passes away, the Travel Coins are automatically and fully refunded to the giver.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">The "Active Explorer" Rule & Coin Maturity</h3>
+                            <p>Travel Coins mature after 18 months. Members who have actively traveled (met a DAO-set threshold) within that period are given a 24-hour choice to book a final trip or convert their maturing coins to LNX. If a member has not traveled, they are only offered the 24-hour window to book a trip. Unused coins from non-travelers are returned to a "Community Travel Pool" to fund travel stipends for all, ensuring contributions always benefit the network.</p>
+                        </div>
+                         <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Passport Stamps (SBTs): Celebrating Exploration</h3>
+                            <p>Upon visiting a community, members can claim a unique, non-transferable digital badge (Soulbound Token) for their Nexus Hub profile. This gamifies travel, encourages exploration, and creates a visual record of a member's engagement with the wider network.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Transport Section -->
+                <section id="transport" class="content-section glass-pane p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-4 tracking-tight border-b-2 border-teal-500/50 pb-2">The Nexus Transport Enterprise</h2>
+                    <p class="text-neutral-400 mb-6">A DAO-owned fleet of autonomous electric vehicles (EVs) that serves as both an internal utility and an economic and social bridge to the outside world.</p>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Dual-Purpose Fleet</h3>
+                            <p>The fleet provides seamless, integrated transport between communities for members using Travel Coins. Simultaneously, it operates as a public ride-share service for surrounding towns, generating income for the DAO treasury.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">The "Community Lift" Program</h3>
+                            <p>A portion of the fleet's operational time is dedicated to providing free, essential transport for needy individuals in surrounding communities, managed through partnerships with local social service organizations. This is a core outreach initiative.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Open-Source & Fair Bounties</h3>
+                            <p>The autonomous driving system will be based on open-source platforms like Openpilot, providing a development project for community members. Maintenance and cleaning are handled via the Nexus Hub bounty board, with reward values pragmatically scaled to the difficulty of the task (e.g., higher LNX for sanitizing a medical transport vehicle).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Marketplace Section -->
+                <section id="marketplace" class="content-section glass-pane p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-4 tracking-tight border-b-2 border-teal-500/50 pb-2">Marketplace Framework</h2>
+                    <p class="text-neutral-400 mb-6">A three-tiered economic system designed to ensure internal needs are met as a basic right, while fostering a healthy economic relationship with the wider world.</p>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Tier 1: Internal Member Access</h3>
+                            <p>For essential goods produced by the community (e.g., food from agrarian pods), members pay a nominal, fixed price in LNX (e.g., 1 LNX). This establishes that basic needs are a right of membership, not a commercial transaction.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Tier 2: External (LNX Discount)</h3>
+                            <p>The public-facing Gateway Marketplace offers goods and services to non-members. A discounted price is offered to those who pay in LNX, creating a gentle incentive for external partners to adopt and use our native token.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Tier 3: External (Standard)</h3>
+                            <p>The standard market price for non-members paying in traditional currency or stablecoins. Revenue from these sales directly funds the DAO treasury, contributing to the community's long-term financial sustainability.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Governance Section -->
+                <section id="governance" class="content-section glass-pane p-6 md:p-8">
+                    <h2 class="text-3xl font-bold mb-4 tracking-tight border-b-2 border-teal-500/50 pb-2">Advanced DAO Governance</h2>
+                    <p class="text-neutral-400 mb-6">Evolved governance mechanisms designed to promote fairness, prevent centralization, and distribute cultural energy across the entire network.</p>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">The "Touring Festival" Model</h3>
+                            <p>To prevent any single community from becoming a cultural "capital," major events like festivals will be designed to tour the network. The host locations will be determined by the DAO, ensuring that all communities have the opportunity to host and benefit from these high-energy gatherings.</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-xl text-sky-300">Regional & Weighted Voting</h3>
+                            <p>For selecting event locations, the DAO will use a two-phase process. First, members vote for a general *region* (e.g., Utopia-North-America-SW). The region with the most collective votes wins. Second, the final host community within that region is chosen by a weighted lottery, giving smaller communities a fair chance to be selected. This prevents the largest communities from always winning and fosters inter-regional collaboration.</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Simple script for active navigation highlighting on scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('#dossier-nav a');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
