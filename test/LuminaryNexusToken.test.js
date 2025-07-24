@@ -58,4 +58,37 @@ describe("LuminaryNexusToken", function () {
     const addr2Balance = await lnxToken.balanceOf(addr2.address);
     expect(addr2Balance).to.equal(expectedReceivedAmount);
   });
+
+  it("Should allow owner to burn tokens", async function () {
+    const initialSupply = await lnxToken.totalSupply();
+    const burnAmount = hre.ethers.parseEther("1000000"); // Burn 1 million tokens
+
+    await lnxToken.burn(owner.address, burnAmount);
+
+    const finalSupply = await lnxToken.totalSupply();
+    const ownerBalance = await lnxToken.balanceOf(owner.address);
+
+    expect(finalSupply).to.equal(initialSupply - burnAmount);
+    expect(ownerBalance).to.equal(initialSupply - burnAmount); // Owner's balance should decrease
+  });
+
+  it("Should allow owner to trigger inflation mint", async function () {
+    const initialSupply = await lnxToken.totalSupply();
+    const initialTreasuryBalance = await lnxToken.balanceOf(treasury.address);
+
+    // Fast forward time to allow inflation
+    await hre.network.provider.send("evm_increaseTime", [365 * 24 * 60 * 60]); // 1 year
+    await hre.network.provider.send("evm_mine");
+
+    await lnxToken.triggerInflationMint();
+
+    const finalSupply = await lnxToken.totalSupply();
+    const finalTreasuryBalance = await lnxToken.balanceOf(treasury.address);
+
+    // Calculate expected inflation (2% of initial supply for 1 year)
+    const expectedInflation = initialSupply * 200n / 10000n; // 2% of initial supply
+
+    expect(finalSupply).to.be.closeTo(initialSupply + expectedInflation, hre.ethers.parseEther("1")); // Allow for minor rounding
+    expect(finalTreasuryBalance).to.be.closeTo(initialTreasuryBalance + expectedInflation, hre.ethers.parseEther("1"));
+  });
 });

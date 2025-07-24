@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
 // Interfaces for Uniswap V2 / QuickSwap
 interface IUniswapV2Factory {
@@ -58,7 +59,7 @@ interface IUniswapV2Router02 {
  * dedicated DistributionContract after this LNX token contract is deployed.
  * Ownership of this contract will eventually be transferred to the Luminary Nexus DAO.
  */
-contract LuminaryNexusToken is ERC20, Ownable {
+contract LuminaryNexusToken is ERC20Votes, Ownable {
     
     // Constants
     uint256 public constant INITIAL_SUPPLY = 1_000_000_000 * 10**18; // 1 Billion tokens, matches White Paper
@@ -119,7 +120,7 @@ contract LuminaryNexusToken is ERC20, Ownable {
         address _initialOwner,
         address _communityTreasury,
         address _routerAddress
-    ) ERC20("Luminary Nexus Token", "LNX") Ownable(_initialOwner) {
+    ) ERC20Votes("Luminary Nexus Token", "LNX", _initialOwner) Ownable(_initialOwner) {
         require(_initialOwner != address(0), "LNX: Invalid initial owner address");
         require(_communityTreasury != address(0), "LNX: Invalid treasury address");
         require(_routerAddress != address(0), "LNX: Invalid router address");
@@ -173,6 +174,19 @@ contract LuminaryNexusToken is ERC20, Ownable {
         require(account != address(0), "LNX: Invalid address for fee exclusion");
         _isExcludedFromFee[account] = excluded;
         emit FeeExclusionUpdated(account, excluded);
+    }
+
+    /**
+     * @dev Allows the owner (initially, then DAO) to set multiple addresses to be excluded from fees.
+     * @param accounts Array of addresses to exclude or include.
+     * @param excluded Boolean indicating whether to exclude (true) or include (false) from fees.
+     */
+    function setExcludedFromFee(address[] calldata accounts, bool excluded) external onlyOwner {
+        for (uint256 i = 0; i < accounts.length; i++) {
+            require(accounts[i] != address(0), "LNX: Invalid address in array for fee exclusion");
+            _isExcludedFromFee[accounts[i]] = excluded;
+            emit FeeExclusionUpdated(accounts[i], excluded);
+        }
     }
     
     /**
@@ -255,89 +269,44 @@ contract LuminaryNexusToken is ERC20, Ownable {
                !_inSwapAndLiquify && 
                liquidityPoolAddress != address(0); // Ensure LP is set
     }
-    
+
     /**
-     * @dev Internal hook called by _transfer to handle custom logic like fees.
+     * @dev Overrides the ERC20's internal `_update` function to implement transaction fees and auto-liquidity.
+     * This function is called by `_transfer`, `_mint`, and `_burn`.
+     * @param from The sender of the tokens (address(0) for minting).
+     * @param to The recipient of the tokens (address(0) for burning).
+     * @param value The amount of tokens being transferred.
      */
-    function _customTransfer(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) internal returns (uint256 actualTransferAmount) {
-        // If auto-liquidity conditions are met, and this isn't part of a liquidity operation itself.
-        if (
-            shouldSwapAndLiquify() &&
-            sender != liquidityPoolAddress && // Don't trigger from LP interactions
-            recipient != liquidityPoolAddress // Don't trigger to LP interactions
-        ) {
-            swapAndLiquifyFees();
-        }
-        
-        // Determine if fees should be taken for this transfer
-        bool takeFee = !_isExcludedFromFee[sender] && 
-                       !_isExcludedFromFee[recipient] &&
-                       treasuryFeePercent + liquidityFeePercent > 0; // Only take fee if there's a fee to take
-        
-        if (!takeFee) {
-            return amount; // No fees, transfer full amount
-        } else {
+    function _update(address from, address to, uint256 value) internal override {
+        // Handle fees only for actual transfers (not minting or burning)
+        if (from != address(0) && to != address(0) && !_isExcludedFromFee[from] && !_isExcludedFromFee[to]) {
             uint256 totalFeePercent = treasuryFeePercent + liquidityFeePercent;
-            uint256 totalFeeAmount = (amount * totalFeePercent) / BASIS_POINTS;
-            
+            uint256 totalFeeAmount = (value * totalFeePercent) / BASIS_POINTS;
+
             if (totalFeeAmount > 0) {
-                uint256 treasuryPortion = (totalFeeAmount * treasuryFeePercent) / totalFeePercent; // Proportional
+                uint256 treasuryPortion = (totalFeeAmount * treasuryFeePercent) / totalFeePercent;
                 uint256 liquidityPortion = totalFeeAmount - treasuryPortion;
 
-                actualTransferAmount = amount - totalFeeAmount;
-                require(actualTransferAmount > 0, "LNX: Amount too small after fees");
-
-                if (treasuryPortion > 0) {
-                    super._transfer(sender, communityTreasury, treasuryPortion);
-                }
-                if (liquidityPortion > 0) {
-                    super._transfer(sender, address(this), liquidityPortion); // Send to this contract for liquifying
-                }
+                // Transfer fees to respective addresses
+                // Note: We use super._update here to avoid re-triggering fee logic recursively.
+                super._update(from, communityTreasury, treasuryPortion);
+                super._update(from, address(this), liquidityPortion); // Send to this contract for liquifying
                 emit FeesDistributed(treasuryPortion, liquidityPortion);
-            } else {
-                actualTransferAmount = amount; // No fee actually calculated (e.g. due to rounding on small amounts)
-            }
-            return actualTransferAmount;
-        }
-    }
-    
-    /**
-     * @dev Overrides ERC20._transfer to integrate custom fee logic.
-     */
-    function _transfer(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) internal virtual override {
-        if (_isExcludedFromFee[sender] || _isExcludedFromFee[recipient] || _inSwapAndLiquify) {
-            super._transfer(sender, recipient, amount);
-        } else {
-            uint256 transferAmount = _customTransfer(sender, recipient, amount);
-            if (transferAmount > 0) { // Ensure there's something left to transfer after fees
-                 super._transfer(sender, recipient, transferAmount);
-            } else if (amount > 0 && transferAmount == 0) {
-                // This case means fees consumed the whole amount, which _customTransfer should prevent with its require.
-                // However, if amount was non-zero and transferAmount became zero, it implies fees were taken.
-                // If _customTransfer already handled fee transfers, nothing more to do here.
-                // If _customTransfer only returned 0, it implies an issue or full fee consumption.
-                // For safety, ensure no tokens are "lost" if _customTransfer logic changes.
-                // Given current _customTransfer, this path should ideally not be hit if amount > 0.
+
+                // Reduce the amount being transferred to the recipient by the total fees
+                value -= totalFeeAmount;
             }
         }
+
+        // Perform the actual token transfer (or mint/burn)
+        super._update(from, to, value);
+
+        // Trigger swapAndLiquifyFees after the transfer is complete, if conditions are met.
+        // Ensure it's not a transfer to/from the liquidity pool itself to avoid reentrancy.
+        if (shouldSwapAndLiquify() && from != liquidityPoolAddress && to != liquidityPoolAddress) {
+            swapAndLiquifyFees();
+        }
     }
-
-    // Note: `transfer` and `transferFrom` are already overridden by ERC20.sol if you inherit it.
-    // OpenZeppelin's ERC20 calls _update, which calls _beforeTokenTransfer and _afterTokenTransfer.
-    // A cleaner way to implement fees is often by overriding _beforeTokenTransfer.
-    // However, your current approach of overriding _transfer and calling super._transfer is also functional.
-    // For simplicity and directness, let's stick to your current override structure for now.
-    // If we were to use _beforeTokenTransfer, the _customTransfer logic would move there.
-
-    // The public `transfer` and `transferFrom` are implicitly using the overridden `_transfer`.
     
     /**
      * @dev Swaps accumulated tokens in this contract for WMATIC and adds liquidity to the LNX/WMATIC pool.
@@ -430,6 +399,17 @@ contract LuminaryNexusToken is ERC20, Ownable {
             lastInflationMintTime = block.timestamp;
             emit InflationMinted(inflationAmount);
         }
+    }
+
+    /**
+     * @dev Allows the owner (initially, then DAO) to burn tokens from a specified account.
+     * This can be used for deflationary measures or to remove tokens from circulation
+     * as decided by the DAO.
+     * @param account The address from which tokens will be burned.
+     * @param amount The amount of tokens to burn.
+     */
+    function burn(address account, uint256 amount) external onlyOwner {
+        _burn(account, amount);
     }
     
     // Fallback function to receive native currency (WMATIC from swaps)
