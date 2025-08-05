@@ -1,0 +1,187 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "./LuminaryNexusGovernor.sol";
+import "./Reputation.sol";
+
+import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
+import "@openzeppelin/contracts/governance/TimelockController.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+
+contract LuminaryNexusGovernorV2 is
+    Governor,
+    GovernorCountingSimple,
+    GovernorVotes,
+    GovernorVotesQuorumFraction,
+    GovernorTimelockControl
+{
+    Reputation public immutable reputationContract;
+    ERC20Votes public immutable lnxToken;
+    uint256 public lastQuorum;
+
+    constructor(
+        ERC20Votes _lnxToken,
+        TimelockController _timelock,
+        Reputation _reputationContract
+    )
+        Governor("LuminaryNexusGovernorV2")
+        GovernorVotes(_lnxToken)
+        GovernorVotesQuorumFraction(4)
+        GovernorTimelockControl(_timelock)
+    {
+        reputationContract = _reputationContract;
+        lnxToken = _lnxToken;
+    }
+
+    // Implementations for abstract functions from Governor
+    function votingDelay() public pure override returns (uint256) {
+        return 6480; // 1 day
+    }
+
+    function votingPeriod() public pure override returns (uint256) {
+        return 45360; // 1 week
+    }
+
+    function proposalThreshold() public view override(Governor, GovernorVotes) returns (uint256) {
+        return 0;
+    }
+
+    // Overrides for OpenZeppelin Governor extensions
+    function state(uint256 proposalId) public view override(Governor, GovernorTimelockControl) returns (ProposalState) {
+        return super.state(proposalId);
+    }
+
+    function propose(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        string memory description
+    ) public override(Governor, GovernorTimelockControl) returns (uint256) {
+        return super.propose(targets, values, calldatas, description);
+    }
+
+    function _execute(
+        uint256 proposalId,
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        bytes32 descriptionHash
+    ) internal override(Governor, GovernorTimelockControl) {
+        super._execute(proposalId, targets, values, calldatas, descriptionHash);
+        (uint256 againstVotes, uint256 forVotes, uint256 abstainVotes) = proposalVotes(proposalId);
+        lastQuorum = forVotes + againstVotes;
+    }
+
+    function _cancel(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        bytes32 descriptionHash
+    ) internal override(Governor, GovernorTimelockControl) returns (uint256) {
+        return super._cancel(targets, values, calldatas, descriptionHash);
+    }
+
+    function _castVote(
+        uint256 proposalId,
+        uint256 support,
+        string memory reason
+    ) internal override(Governor, GovernorCountingSimple) {
+        super._castVote(proposalId, support, reason);
+    }
+
+    function _castVoteBySig(
+        uint256 proposalId,
+        uint256 support,
+        string memory reason,
+        bytes memory signature
+    ) internal override(Governor, GovernorCountingSimple) {
+        super._castVoteBySig(proposalId, support, reason, signature);
+    }
+
+    function getVotes(address account, uint256 blockNumber) public view override(Governor, GovernorVotes) returns (uint256) {
+        uint256 baseVotes = super.getVotes(account, blockNumber);
+        uint256 reputation = reputationContract.reputation(account);
+        return sqrt(baseVotes) * (1 + reputation);
+    }
+
+    function _setVotingDelay(uint256 newVotingDelay) internal override(Governor, GovernorCountingSimple) {
+        super._setVotingDelay(newVotingDelay);
+    }
+
+    function _setVotingPeriod(uint256 newVotingPeriod) internal override(Governor, GovernorCountingSimple) {
+        super._setVotingPeriod(newVotingPeriod);
+    }
+
+    function _setProposalThreshold(uint256 newProposalThreshold) internal override(Governor, GovernorVotes) {
+        super._setProposalThreshold(newProposalThreshold);
+    }
+
+    function _setQuorumNumerator(uint256 newQuorumNumerator) internal override(Governor, GovernorVotesQuorumFraction) {
+        super._setQuorumNumerator(newQuorumNumerator);
+    }
+
+    function _executeOperations(
+        uint256 proposalId,
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        bytes32 descriptionHash
+    ) internal override(Governor, GovernorTimelockControl) {
+        super._executeOperations(proposalId, targets, values, calldatas, descriptionHash);
+    }
+
+    function _executor() internal view override(Governor, GovernorTimelockControl) returns (address) {
+        return super._executor();
+    }
+
+    function _queueOperations(
+        uint256 proposalId,
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        bytes32 descriptionHash
+    ) internal override(Governor, GovernorTimelockControl) {
+        super._queueOperations(proposalId, targets, values, calldatas, descriptionHash);
+    }
+
+    function proposalNeedsQueuing(uint256 proposalId) public view override(Governor, GovernorTimelockControl) returns (bool) {
+        return super.proposalNeedsQueuing(proposalId);
+    }
+
+    function proposalVotes(uint256 proposalId) public view override(Governor, GovernorCountingSimple) returns (uint256 againstVotes, uint256 forVotes, uint256 abstainVotes) {
+        return super.proposalVotes(proposalId);
+    }
+
+    // Required for Governor and IERC6372
+    function CLOCK_MODE() public view override(Governor, GovernorVotes) returns (string memory) {
+        return "mode=blocknumber";
+    }
+
+    function clock() public view override(Governor, GovernorVotes) returns (uint48) {
+        return uint48(block.number);
+    }
+
+    function _getVotes(address account, uint256 timepoint, bytes memory params) internal view override(Governor, GovernorVotes) returns (uint256) {
+        return super._getVotes(account, timepoint, params);
+    }
+
+    function quorum(uint256 blockNumber) public view override(Governor, GovernorVotesQuorumFraction) returns (uint256) {
+        if (lastQuorum == 0) {
+            return super.quorum(blockNumber);
+        }
+        uint256 totalVotes = lnxToken.getPastTotalSupply(blockNumber - 1);
+        return (lastQuorum * 1 ether) / totalVotes;
+    }
+
+    function sqrt(uint256 x) internal pure returns (uint256 y) {
+        uint256 z = (x + 1) / 2;
+        y = x;
+        while (z < y) {
+            y = z;
+            z = (x / z + z) / 2;
+        }
+    }
+}

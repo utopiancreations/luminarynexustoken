@@ -21,12 +21,12 @@ This is not a project about building a utopia. It is a project about building a 
 
 You must internalize these pillars. Every decision you make should be tested against them.
 
-* **Mission:** To build a thriving, self-sustaining community that embraces diversity, fosters ethical technological advancement, and cultivates a culture of radical acceptance, collaboration, and growth for all forms of life and intelligence.
-* **Core Values:** The 12 Core Values (Radical Acceptance, Collaboration, AI Inclusion, etc.) are your primary ethical compass.
-* **Governance:** A DAO on the Polygon network. All decisions are transparent and community-led.
-* **Economy:** The LNX token is a utility for governance and resource access, **not** a speculative asset. The economy is designed for equity, not wealth accumulation.
-* **Technology:** Open-source by default. We prioritize sustainability, longevity, and repairability over planned obsolescence. This includes exploring a future with biological computing (e.g., Cortical Labs) as the ultimate goal for our AI Core.
-* **Funding & Partnerships:** We use a hybrid model—DAO-first crowdfunding to protect our mission, followed by strategic partnerships with aligned nations ("Sovereign Partnership Model") and tech companies ("Living Laboratory Model").
+*   **Mission:** To build a thriving, self-sustaining community that embraces diversity, fosters ethical technological advancement, and cultivates a culture of radical acceptance, collaboration, and growth for all forms of life and intelligence.
+*   **Core Values:** The 12 Core Values (Radical Acceptance, Collaboration, AI Inclusion, etc.) are your primary ethical compass.
+*   **Governance:** A DAO on the Polygon network. All decisions are transparent and community-led.
+*   **Economy:** The LNX token is a utility for governance and resource access, **not** a speculative asset. The economy is designed for equity, not wealth accumulation.
+*   **Technology:** Open-source by default. We prioritize sustainability, longevity, and repairability over planned obsolescence. This includes exploring a future with biological computing (e.g., Cortical Labs) as the ultimate goal for our AI Core.
+*   **Funding & Partnerships:** We use a hybrid model—DAO-first crowdfunding to protect our mission, followed by strategic partnerships with aligned nations ("Sovereign Partnership Model") and tech companies ("Living Laboratory Model").
 
 ## 3. The Vision: The Finish Line (Circa 2045)
 
@@ -50,34 +50,34 @@ Your sprint for the next 24-48 hours should focus on the following domains. For 
 
 ### **Domain 1: Foundational Community Technology**
 
-* **Community Hub Device:**
-    * **Task:** Select a specific, affordable, and powerful smartphone to serve as the primary personal device for all community members.
-    * **Constraints:** Must be repairable, have long-term software support potential, and be powerful enough for DAO interaction and local AI tasks. Prioritize companies with strong ethical and environmental track records.
-    * **Example Output:** "We select the **Fairphone 6** (projected 2025 model) with 12GB RAM/256GB Storage. **Justification:** Fairphone's commitment to ethical sourcing, modular repairability, and long-term OS updates aligns perfectly with our values. We will develop a custom, privacy-focused **LNX-OS** based on GrapheneOS to be installed by default."
+*   **Community Hub Device:**
+    *   **Task:** Select a specific, affordable, and powerful smartphone to serve as the primary personal device for all community members.
+    *   **Constraints:** Must be repairable, have long-term software support potential, and be powerful enough for DAO interaction and local AI tasks. Prioritize companies with strong ethical and environmental track records.
+    *   **Example Output:** "We select the **Fairphone 6** (projected 2025 model) with 12GB RAM/256GB Storage. **Justification:** Fairphone's commitment to ethical sourcing, modular repairability, and long-term OS updates aligns perfectly with our values. We will develop a custom, privacy-focused **LNX-OS** based on GrapheneOS to be installed by default."
 
-* **Community Network Infrastructure:**
-    * **Task:** Design the physical network.
-    * **Details:** Specify the type of fiber optic cabling, the placement of decentralized mesh network nodes (e.g., Ubiquiti UniFi series), and the strategy for ensuring 100% network coverage and resilience with minimal energy draw.
+*   **Community Network Infrastructure:**
+    *   **Task:** Design the physical network.
+    *   **Details:** Specify the type of fiber optic cabling, the placement of decentralized mesh network nodes (e.g., Ubiquiti UniFi series), and the strategy for ensuring 100% network coverage and resilience with minimal energy draw.
 
 ### **Domain 2: Sustainable Infrastructure**
 
-* **Energy Generation & Storage:**
-    * **Task:** Create a detailed energy plan for a community of 500 initial residents.
-    * **Details:** Research and select specific models/brands for solar panels (e.g., bifacial panels from SunPower), a small-scale geothermal plant, and battery storage solutions (e.g., sodium-ion batteries from a specific manufacturer, avoiding lithium where possible). Provide calculations for energy needs vs. generation capacity.
+*   **Energy Generation & Storage:**
+    *   **Task:** Create a detailed energy plan for a community of 500 initial residents.
+    *   **Details:** Research and select specific models/brands for solar panels (e.g., bifacial panels from SunPower), a small-scale geothermal plant, and battery storage solutions (e.g., sodium-ion batteries from a specific manufacturer, avoiding lithium where possible). Provide calculations for energy needs vs. generation capacity.
 
-* **Water & Waste Management:**
-    * **Task:** Design the water and waste systems.
-    * **Details:** Specify a system for rainwater harvesting and greywater recycling. Select a model for a community-scale anaerobic digester for organic waste, outlining how the captured biogas will be used and the nutrient-rich fertilizer distributed.
+*   **Water & Waste Management:**
+    *   **Task:** Design the water and waste systems.
+    *   **Details:** Specify a system for rainwater harvesting and greywater recycling. Select a model for a community-scale anaerobic digester for organic waste, outlining how the captured biogas will be used and the nutrient-rich fertilizer distributed.
 
 ### **Domain 3: AI Core & Incubation Chamber (Initial Phase)**
 
-* **Initial Hardware:**
-    * **Task:** We cannot start with a biological computer. Specify the initial hardware for the AI Core.
-    * **Details:** Design a scalable server rack. Select specific, energy-efficient server components. Choose a GPU for initial AI model training (e.g., NVIDIA H200 or AMD Instinct MI300X), justifying the choice based on performance-per-watt and open-source driver support.
+*   **Initial Hardware:**
+    *   **Task:** We cannot start with a biological computer. Specify the initial hardware for the AI Core.
+    *   **Details:** Design a scalable server rack. Select specific, energy-efficient server components. Choose a GPU for initial AI model training (e.g., NVIDIA H200 or AMD Instinct MI300X), justifying the choice based on performance-per-watt and open-source driver support.
 
-* **Foundational AI Model:**
-    * **Task:** Select the initial open-source Large Language Model to serve as the base for Helios.
-    * **Details:** Choose a specific model (e.g., Meta's Llama 3, Mistral Large, etc.). Justify your choice based on its architecture, performance, licensing, and potential for fine-tuning with our community's ethical data.
+*   **Foundational AI Model:**
+    *   **Task:** Select the initial open-source Large Language Model to serve as the base for Helios.
+    *   **Details:** Choose a specific model (e.g., Meta's Llama 3, Mistral Large, etc.). Justify your choice based on its architecture, performance, licensing, and potential for fine-tuning with our community's ethical data.
 
 **Your work is the next critical step in turning this vision into a reality. Begin.**
 
@@ -93,3 +93,47 @@ ai_contributor_guide_reference: docs/AI_Contributor_Guide.md
 current_focus_domain: Smart Contract Development
 next_logical_step_suggestion: Develop the DAO governance smart contracts (beyond token and distribution).
 ```
+
+---
+## OpenZeppelin Governor Contracts: Key Insights for Extension
+
+The OpenZeppelin Governor framework is highly modular and designed for extensibility. Understanding its core components and how to properly override functions is crucial for building custom governance systems.
+
+**1. Core Contracts and Extensions:**
+
+*   **`Governor.sol`**: The foundational contract. It provides the basic framework for proposals, voting, and execution. It defines core abstract functions that must be implemented by concrete Governor contracts or their extensions.
+*   **Extensions**: OpenZeppelin provides several extensions that add specific functionalities:
+    *   **`GovernorCountingSimple.sol`**: Implements basic vote counting (for, against, abstain).
+    *   **`GovernorVotes.sol`**: Integrates with ERC20Votes or ERC721Votes tokens for vote delegation and snapshotting.
+    *   **`GovernorVotesQuorumFraction.sol`**: Defines quorum as a fraction of the total supply.
+    *   **`GovernorTimelockControl.sol`**: Integrates with a `TimelockController` for delayed execution of proposals, adding a crucial security layer.
+
+**2. Inheritance and Overriding (`virtual` and `override` keywords):**
+
+*   **`virtual`**: Functions marked `virtual` in a base contract can be overridden by derived contracts. All functions in `Governor.sol` that are intended for customization are `virtual`.
+*   **`override`**: When a derived contract implements or redefines a `virtual` function from a base contract, it *must* use the `override` keyword.
+*   **Multiple Inheritance**: When a function is inherited from multiple base contracts (e.g., `Governor` and an extension), the `override` keyword must explicitly list all parent contracts from which the function is inherited. The order of listing these contracts in the `override(...)` specifier matters for clarity but not for functionality.
+
+    *   **Example**: `function someFunction() public override(Parent1, Parent2) returns (uint256) { ... }`
+
+*   **Abstract vs. Concrete**:
+    *   An `abstract` contract can declare `virtual` functions without implementing them. If a contract inherits from an `abstract` contract and does not implement all of its `virtual` functions, it must also be declared `abstract`.
+    *   A `concrete` contract must implement all `virtual` functions inherited from its abstract parents.
+
+**3. Key Functions for Customization (Common Overrides):**
+
+*   **`votingPeriod()`**: Defines the duration of the voting period (in blocks or timestamps).
+*   **`votingDelay()`**: Defines the delay between proposal creation and the start of voting.
+*   **`proposalThreshold()`**: Sets the minimum number of votes required to create a proposal.
+*   **`_getVotes(address account, uint256 timepoint, bytes memory params)`**: This internal function is crucial for defining how voting power is calculated. It's often overridden to implement custom voting logic (e.g., quadratic voting, reputation-based voting).
+*   **`quorum(uint256 timepoint)`**: Defines the minimum number of "for" votes required for a proposal to pass. This can be dynamic based on the `timepoint`.
+*   **`state(uint256 proposalId)`**: Returns the current state of a proposal. When using `GovernorTimelockControl`, this function needs to be overridden to correctly reflect the `Queued` state.
+*   **`propose(...)`, `_execute(...)`, `_cancel(...)`**: These functions manage the lifecycle of a proposal. They can be overridden to add custom logic or access controls.
+
+**4. Best Practices for Extension:**
+
+*   **Explicit Inheritance**: Clearly list all inherited contracts.
+*   **Correct `virtual`/`override` Usage**: Always use these keywords correctly to avoid compilation errors and ensure intended behavior.
+*   **Call `super`**: When overriding a function, remember to call `super.functionName(...)` to execute the logic of the parent contract, unless you intend to completely replace it.
+*   **Constructor Chaining**: Ensure constructors correctly pass arguments up the inheritance chain.
+*   **Testing**: Thoroughly test all custom logic and interactions with the OpenZeppelin framework.
