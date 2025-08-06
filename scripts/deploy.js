@@ -3,23 +3,34 @@ const { ethers, network } = require("hardhat");
 const fs = require("fs");
 const path = require("path");
 
+// 🏛️ LUMINARY NEXUS DAO - OFFICIAL WALLET ADDRESSES
+// These are the five public wallet addresses for our DAO operations
+const DAO_WALLETS = {
+  ADMIN: "0x77bc51eb24056dcf949c36c09025fdfbaf69e53b",           // Admin Account 1
+  TREASURY: "0xf4f245afa81bcc72c986346ce8d949ea1eb4f0ae",        // Treasury Account 2  
+  AIRDROP_LIQUIDITY: "0x860c1b6a8bedc2d3b766d5da7830fbab815c4911", // Airdrop & Liquidity Account 3
+  TEST_ACCOUNT_4: "0x9dc599dcb37af9b96d96b87c97ee89f98c890185",    // Test Account 4
+  TEST_ACCOUNT_5: "0x9dc599dcb37af9b96d96b87c97ee89f98c890185"     // Test Account 5
+};
+
 async function main() {
   try {
-    console.log("Deploying Luminary Nexus Token (LNX)...");
-    console.log(`Network: ${network.name}`);
+    console.log("🚀 Deploying Luminary Nexus Token (LNX)...");
+    console.log(`📡 Network: ${network.name}`);
+    console.log("🏛️ Using official DAO wallet addresses");
     
     // Get deployer account
     const [deployer] = await ethers.getSigners();
-    console.log(`Deploying with account: ${deployer.address}`);
+    console.log(`👤 Deploying with account: ${deployer.address}`);
 
-    // Get treasury address from .env or use deployer as fallback
-    const treasuryAddressRaw = process.env.TREASURY_ADDRESS || deployer.address;
+    // Use official treasury address
+    const treasuryAddressRaw = DAO_WALLETS.TREASURY;
     
     // For QuickSwap Router on Polygon networks
     let routerAddressRaw;
     
     if (network.name === "amoy") {
-      // QuickSwap router on Amoy (adjust if needed)
+      // QuickSwap router on Amoy testnet
       routerAddressRaw = "0x71E6F855A34F44139A79Ec20Dc0B0806c4cFB9D8";
     } else if (network.name === "polygon") {
       // QuickSwap router on Polygon mainnet
@@ -30,17 +41,16 @@ async function main() {
     }
     
     // Format addresses with proper checksum
-    // IMPORTANT: Lowercase first, then get proper checksum
     const routerAddress = ethers.getAddress(routerAddressRaw.toLowerCase());
     const treasuryAddress = ethers.getAddress(treasuryAddressRaw.toLowerCase());
     
-    console.log(`Using router address: ${routerAddress}`);
-    console.log(`Using treasury address: ${treasuryAddress}`);
+    console.log(`🔗 Using router address: ${routerAddress}`);
+    console.log(`💰 Using treasury address: ${treasuryAddress}`);
 
     // Get your contract factory
     const LuminaryNexusToken = await ethers.getContractFactory("LuminaryNexusToken");
     
-    console.log("Deploying token contract...");
+    console.log("📋 Deploying token contract...");
     const token = await LuminaryNexusToken.deploy(
       deployer.address,  // _initialOwner
       treasuryAddress,   // _communityTreasury
@@ -49,21 +59,19 @@ async function main() {
     
     // Wait for deployment to complete (more confirmations for testnet/mainnet)
     const confirmations = network.name === "hardhat" ? 1 : 2;
-    console.log(`Waiting for ${confirmations} confirmations...`);
+    console.log(`⏳ Waiting for ${confirmations} confirmations...`);
     await token.deploymentTransaction().wait(confirmations);
     
     const tokenAddress = await token.getAddress();
-    console.log(`Token deployed to: ${tokenAddress}`);
+    console.log(`✅ Token deployed to: ${tokenAddress}`);
 
     // --- Deploy LuminaryNexusDistribution contract ---
-    console.log("\nDeploying Luminary Nexus Distribution contract...");
+    console.log("\n📦 Deploying Luminary Nexus Distribution contract...");
     const LuminaryNexusDistribution = await ethers.getContractFactory("LuminaryNexusDistribution");
 
-    // For the airdrop mechanism, we can use a placeholder or a dedicated airdrop contract address.
-    // For now, let's use the deployer address as a placeholder for the airdrop mechanism.
-    // In a real scenario, this would be a more sophisticated contract or a multi-sig.
-    const airdropMechanismAddress = deployer.address; 
-    const founderAddress = deployer.address; // Assuming deployer is also the founder for initial setup
+    // Use official DAO wallets for distribution
+    const airdropMechanismAddress = DAO_WALLETS.AIRDROP_LIQUIDITY; 
+    const founderAddress = DAO_WALLETS.ADMIN; // Admin account manages founder allocation
 
     const distribution = await LuminaryNexusDistribution.deploy(
       tokenAddress,             // _lnxTokenAddress
@@ -75,28 +83,28 @@ async function main() {
 
     await distribution.deploymentTransaction().wait(confirmations);
     const distributionAddress = await distribution.getAddress();
-    console.log(`Distribution contract deployed to: ${distributionAddress}`);
+    console.log(`✅ Distribution contract deployed to: ${distributionAddress}`);
 
     // Exclude the distribution contract from fees in the LNX token contract
-    console.log("Excluding distribution contract from LNX token fees...");
+    console.log("🔧 Excluding distribution contract from LNX token fees...");
     await token.excludeFromFee(distributionAddress, true);
-    console.log("Distribution contract excluded from LNX token fees.");
+    console.log("✅ Distribution contract excluded from LNX token fees.");
 
     // --- Transfer initial supply to Distribution contract ---
-    console.log("\nTransferring initial LNX supply to Distribution contract...");
+    console.log("\n💸 Transferring initial LNX supply to Distribution contract...");
     const initialSupply = await token.INITIAL_SUPPLY();
     const transferTx = await token.transfer(distributionAddress, initialSupply);
     await transferTx.wait();
-    console.log(`Transferred ${ethers.formatEther(initialSupply)} LNX to Distribution contract.`);
+    console.log(`✅ Transferred ${ethers.formatEther(initialSupply)} LNX to Distribution contract.`);
 
     // --- Execute initial distribution ---
-    console.log("\nExecuting initial distribution...");
+    console.log("\n🎯 Executing initial distribution...");
     const executeTx = await distribution.executeInitialDistribution();
     await executeTx.wait();
-    console.log("Initial distribution executed successfully!");
+    console.log("✅ Initial distribution executed successfully!");
 
     // --- Deploy LuminaryNexusTimelock contract ---
-    console.log("\nDeploying Luminary Nexus Timelock contract...");
+    console.log("\n⏰ Deploying Luminary Nexus Timelock contract...");
     const LuminaryNexusTimelock = await ethers.getContractFactory("LuminaryNexusTimelock");
     const timelock = await LuminaryNexusTimelock.deploy(
       deployer.address, // proposer (initially deployer, will be governor)
@@ -105,59 +113,88 @@ async function main() {
     );
     await timelock.deploymentTransaction().wait(confirmations);
     const timelockAddress = await timelock.getAddress();
-    console.log(`Timelock deployed to: ${timelockAddress}`);
+    console.log(`✅ Timelock deployed to: ${timelockAddress}`);
 
-    // --- Deploy LuminaryNexusGovernor contract ---
-    console.log("\nDeploying Luminary Nexus Governor contract...");
-    const LuminaryNexusGovernor = await ethers.getContractFactory("LuminaryNexusGovernor");
-    const governor = await LuminaryNexusGovernor.deploy(
-      tokenAddress,    // _lnxTokenAddress
-      timelockAddress  // _timelockAddress
+    // --- Deploy LuminaryNexusGovernorV2 contract ---
+    console.log("\n🏛️ Deploying Luminary Nexus GovernorV2 contract...");
+    const LuminaryNexusGovernorV2 = await ethers.getContractFactory("LuminaryNexusGovernorV2");
+    
+    // Deploy Reputation contract first for GovernorV2
+    console.log("📊 Deploying Reputation contract for governance...");
+    const Reputation = await ethers.getContractFactory("Reputation");
+    const reputation = await Reputation.deploy();
+    await reputation.deploymentTransaction().wait(confirmations);
+    const reputationAddress = await reputation.getAddress();
+    console.log(`✅ Reputation deployed to: ${reputationAddress}`);
+    
+    const governor = await LuminaryNexusGovernorV2.deploy(
+      tokenAddress,     // _lnxTokenAddress
+      timelockAddress,  // _timelockAddress
+      reputationAddress // _reputationAddress
     );
     await governor.deploymentTransaction().wait(confirmations);
     const governorAddress = await governor.getAddress();
-    console.log(`Governor deployed to: ${governorAddress}`);
+    console.log(`✅ GovernorV2 deployed to: ${governorAddress}`);
 
     // --- Configure DAO roles and ownership ---
-    console.log("\nConfiguring DAO roles and ownership...");
+    console.log("\n🔐 Configuring DAO roles and ownership...");
 
     // Transfer ownership of LNX Token to the Governor contract
-    console.log("Transferring LNX Token ownership to Governor...");
+    console.log("👑 Transferring LNX Token ownership to Governor...");
     await token.transferOwnership(governorAddress);
-    console.log("LNX Token ownership transferred.");
+    console.log("✅ LNX Token ownership transferred.");
 
     // Grant PROPOSER_ROLE and EXECUTOR_ROLE to the Governor on the Timelock
     const PROPOSER_ROLE = await timelock.PROPOSER_ROLE();
     const EXECUTOR_ROLE = await timelock.EXECUTOR_ROLE();
     const ADMIN_ROLE = await timelock.DEFAULT_ADMIN_ROLE();
 
-    console.log("Granting PROPOSER_ROLE to Governor on Timelock...");
+    console.log("📝 Granting PROPOSER_ROLE to Governor on Timelock...");
     await timelock.grantRole(PROPOSER_ROLE, governorAddress);
-    console.log("Granting EXECUTOR_ROLE to Governor on Timelock...");
+    console.log("⚡ Granting EXECUTOR_ROLE to Governor on Timelock...");
     await timelock.grantRole(EXECUTOR_ROLE, governorAddress);
 
     // Revoke deployer's ADMIN_ROLE on the Timelock
-    console.log("Revoking deployer's ADMIN_ROLE on Timelock...");
+    console.log("🚫 Revoking deployer's ADMIN_ROLE on Timelock...");
     await timelock.revokeRole(ADMIN_ROLE, deployer.address);
-    console.log("Deployer's ADMIN_ROLE revoked.");
+    console.log("✅ Deployer's ADMIN_ROLE revoked.");
 
-    console.log("DAO configuration complete.");
+    console.log("🎉 DAO configuration complete.");
     
     // Save deployment info
     const deploymentInfo = {
       network: network.name,
-      tokenAddress: tokenAddress,
-      distributionAddress: distributionAddress,
-      timelockAddress: timelockAddress,
-      governorAddress: governorAddress,
-      routerAddress: routerAddress,
-      treasuryAddress: treasuryAddress,
-      deployer: deployer.address,
-      deploymentTxHash: token.deploymentTransaction().hash,
-      distributionTxHash: distribution.deploymentTransaction().hash,
-      initialTransferTxHash: transferTx.hash,
-      initialDistributionExecuteTxHash: executeTx.hash,
+      daoWallets: DAO_WALLETS,
+      contracts: {
+        token: tokenAddress,
+        distribution: distributionAddress,
+        timelock: timelockAddress,
+        governor: governorAddress,
+        reputation: reputationAddress
+      },
+      addresses: {
+        router: routerAddress,
+        treasury: treasuryAddress,
+        airdropLiquidity: airdropMechanismAddress,
+        founder: founderAddress,
+        deployer: deployer.address
+      },
+      transactionHashes: {
+        tokenDeployment: token.deploymentTransaction().hash,
+        distributionDeployment: distribution.deploymentTransaction().hash,
+        timelockDeployment: timelock.deploymentTransaction().hash,
+        reputationDeployment: reputation.deploymentTransaction().hash,
+        governorDeployment: governor.deploymentTransaction().hash,
+        initialTransfer: transferTx.hash,
+        initialDistribution: executeTx.hash
+      },
       timestamp: new Date().toISOString(),
+      blockNumbers: {
+        token: (await token.deploymentTransaction().wait()).blockNumber,
+        distribution: (await distribution.deploymentTransaction().wait()).blockNumber,
+        timelock: (await timelock.deploymentTransaction().wait()).blockNumber,
+        governor: (await governor.deploymentTransaction().wait()).blockNumber
+      }
     };
 
     // Ensure deployments directory exists
@@ -173,8 +210,19 @@ async function main() {
       JSON.stringify(deploymentInfo, null, 2)
     );
 
-    console.log(`Deployment information saved to ${deploymentFilePath}`);
-    console.log("Deployment completed successfully!");
+    console.log(`💾 Deployment information saved to ${deploymentFilePath}`);
+    console.log("🎉 Deployment completed successfully!");
+    
+    // Print summary
+    console.log("\n📋 DEPLOYMENT SUMMARY:");
+    console.log("=" .repeat(50));
+    console.log(`🌐 Network: ${network.name}`);
+    console.log(`📋 LuminaryNexusToken: ${tokenAddress}`);
+    console.log(`📦 LuminaryNexusDistribution: ${distributionAddress}`);
+    console.log(`⏰ LuminaryNexusTimelock: ${timelockAddress}`);
+    console.log(`📊 Reputation: ${reputationAddress}`);
+    console.log(`🏛️ LuminaryNexusGovernorV2: ${governorAddress}`);
+    console.log("=" .repeat(50));
 
     // Verify contracts on block explorer if not on a local network
     if (network.name !== "localhost" && network.name !== "hardhat") {
