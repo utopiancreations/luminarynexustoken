@@ -22,9 +22,18 @@ contract Reputation {
      * @param user The address of the user.
      * @param newReputation The new reputation score.
      */
-    function updateReputation(address user, uint256 newReputation) external {
+    function updateReputation(address user, uint256 newReputation) public {
         require(msg.sender == owner, "Only owner can update reputation");
         reputation[user] = newReputation;
         emit ReputationUpdated(user, newReputation);
+    }
+
+    /**
+     * @dev Set the reputation of a user (alias for updateReputation for testing).
+     * @param user The address of the user.
+     * @param newReputation The new reputation score.
+     */
+    function setReputation(address user, uint256 newReputation) external {
+        updateReputation(user, newReputation);
     }
 }
