@@ -8,6 +8,8 @@
     "test:all": "hardhat test",
     "test:coverage": "hardhat coverage",
     "test:gas": "REPORT_GAS=true hardhat test",
+    "test:deployed": "hardhat run scripts/test-deployed-contracts.js --network amoy",
+    "test:readonly": "hardhat run scripts/test-readonly.js --network amoy",
     "compile": "hardhat compile",
     "clean": "hardhat clean",
     "deploy:localhost": "hardhat run scripts/deploy.js --network localhost",

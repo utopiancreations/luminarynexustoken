@@ -57,11 +57,11 @@ Once deployed, our contracts will be available at these addresses:
 
 ### **🏛️ Core DAO Contracts**
 ```
-LuminaryNexusToken (LNX):     [TO_BE_UPDATED]
-LuminaryNexusDistribution:    [TO_BE_UPDATED] 
-LuminaryNexusTimelock:        [TO_BE_UPDATED]
-LuminaryNexusGovernorV2:      [TO_BE_UPDATED]
-Reputation System:            [TO_BE_UPDATED]
+LuminaryNexusToken (LNX):     0xeb00351221478b1A25117bcDa9F0E19BA507cAcC
+LuminaryNexusDistribution:    0x4F4245afA81bcC72c986346CE8d949EA1Eb4F0ae
+LuminaryNexusTimelock:        0x860C1B6A8BeDC2d3b766D5DA7830FBaB815C4911
+LuminaryNexusGovernorV2:      0xdC0baD1E4A86ef824Ea08F94839437545FE56dfD
+Reputation System:            0x9dc599DCb37af9B96D96b87c97Ee89f98c890185
 ```
 
 ### **🔗 Official DAO Wallets**

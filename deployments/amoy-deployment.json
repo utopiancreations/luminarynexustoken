@@ -1,0 +1,44 @@
+{
+  "network": "amoy",
+  "chainId": 80002,
+  "timestamp": "2025-08-23T00:00:00.000Z",
+  "deployer": "0x77Bc51eB24056DCf949C36c09025FDFBaF69E53b",
+  "contracts": {
+    "LuminaryNexusToken": {
+      "address": "0xeb00351221478b1A25117bcDa9F0E19BA507cAcC",
+      "name": "Luminary Nexus Token",
+      "symbol": "LNX",
+      "totalSupply": "1000000000000000000000000000"
+    },
+    "LuminaryNexusDistribution": {
+      "address": "0x8f23A4023434111bBFcEf7Ab6bc6B9F149D62dbe",
+      "description": "Token distribution contract for initial allocations"
+    },
+    "LuminaryNexusTimelock": {
+      "address": "0xBab699A7DCFE8E12F9Cc7061152c1eCbae1af2BE",
+      "description": "Timelock controller with 2-day delay",
+      "minDelay": "172800"
+    },
+    "Reputation": {
+      "address": "0xB6C516FFD6538e41D55437ef18d8dB5663cFF036",
+      "description": "Reputation system for enhanced voting power"
+    },
+    "LuminaryNexusGovernorV2": {
+      "address": "0xdC0baD1E4A86ef824Ea08F94839437545FE56dfD",
+      "description": "Advanced governance with quadratic voting and reputation"
+    }
+  },
+  "daoWallets": {
+    "admin": "0x77bc51eb24056dcf949c36c09025fdfbaf69e53b",
+    "treasury": "0xf4f245afa81BcC72C986346cE8d949eA1eB4f0ae",
+    "airdropLiquidity": "0x860c1b6a8bedc2d3b766d5da7830fbab815c4911",
+    "testAccount4": "0x9dc599dcb37af9b96d96b87c97ee89f98c890185",
+    "testAccount5": "0x9dc599dcb37af9b96d96b87c97ee89f98c890185"
+  },
+  "status": {
+    "deployed": true,
+    "distributionExecuted": true,
+    "ownershipTransferred": false,
+    "rolesConfigured": false
+  }
+}
