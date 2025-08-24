@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -10,9 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * according to the percentages outlined in the Luminary Nexus White Paper.
  * It is designed to be funded by the initial owner of the LNX token contract,
  * and then execute the distribution in a transparent, on-chain manner.
- * 
- * Updated for OpenZeppelin v5 compatibility.
- * @custom:version 2.0.0
+ * @custom:version 1.0.0
  */
 contract LuminaryNexusDistribution is Ownable {
     IERC20 public immutable lnxToken; // The LNX token contract instance
@@ -61,7 +59,7 @@ contract LuminaryNexusDistribution is Ownable {
         address payable _founder,
         address _airdropMechanism,
         address _initialDistributionOwner 
-    ) Ownable(_initialDistributionOwner) { // OpenZeppelin v5 Ownable constructor
+    ) Ownable(_initialDistributionOwner) { // Sets the owner of this DistributionContract
         require(_lnxTokenAddress != address(0), "Distribute: LNX Token zero address");
         require(_daoTreasury != address(0), "Distribute: DAO Treasury zero address");
         require(_founder != address(0), "Distribute: Founder zero address");
