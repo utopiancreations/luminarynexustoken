@@ -20,7 +20,8 @@
     "lint:fix": "eslint . --ext .js,.sol --fix",
     "format": "prettier --write \"**/*.{js,sol,json,md}\"",
     "security:slither": "slither .",
-    "docs": "hardhat docgen"
+  "docs": "hardhat docgen",
+  "finalize:amoy": "hardhat run scripts/finalize-dao.js --network amoy"
   },
   "keywords": ["blockchain", "ethereum", "polygon", "dao", "governance", "defi"],
   "author": "Utopian Creations",

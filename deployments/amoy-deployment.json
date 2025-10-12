@@ -38,7 +38,7 @@
   "status": {
     "deployed": true,
     "distributionExecuted": true,
-    "ownershipTransferred": false,
-    "rolesConfigured": false
+    "ownershipTransferred": true,
+    "rolesConfigured": true
   }
 }
