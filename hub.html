@@ -3,284 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luminary Nexus - Project Hub</title>
+    <title>Luminary Nexus - Nexus Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --grid-color: rgba(30, 213, 228, 0.1);
-            --spotlight-color: rgba(30, 213, 228, 0.15);
-            --spotlight-size: 400px;
+            --grid-color: rgba(55, 65, 81, 0.4);
+            --bg-color: #030712;
+            --pane-bg: rgba(17, 24, 39, 0.8);
+            --pane-border: rgba(255, 255, 255, 0.1);
         }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0a0a0a;
-            color: #e5e5e5;
-            overflow: hidden; /* Hide scrollbars during welcome */
-        }
-
-        /* Interactive Grid Background */
-        .main-container {
-            position: relative;
-            z-index: 1;
-        }
-        .main-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            background-color: var(--bg-color);
+            color: #f3f4f6;
             background-image:
                 linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
                 linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
             background-size: 40px 40px;
-            animation: pan-grid 20s linear infinite;
-            z-index: -2;
         }
-        .main-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--spotlight-color) 0%, transparent 40%);
-            z-index: -1;
-            pointer-events: none; /* Allows clicks to pass through */
+        .font-mono { font-family: 'Share Tech Mono', monospace; }
+        .glass-pane {
+            background-color: var(--pane-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--pane-border);
+            border-radius: 1rem;
         }
-
-        @keyframes pan-grid {
-            0% { background-position: 0 0; }
-            100% { background-position: 40px 40px; }
-        }
-
-        /* Welcome Screen */
-        #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #0a0a0a; z-index: 100; display: flex;
-            align-items: center; justify-content: center;
-            font-family: 'Share Tech Mono', monospace; transition: opacity 1s ease-out;
-        }
-        .typing-effect { overflow: hidden; white-space: nowrap; animation: typing 2s steps(40, end); display: inline-block; }
-        .blinking-cursor { animation: blink-caret .75s step-end infinite; display: inline-block; vertical-align: bottom; }
-        @keyframes typing { from { width: 0 } to { width: 100% } }
-        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #14d5e4; } }
-
-        /* Main Content Styling */
-        #main-content { opacity: 0; transition: opacity 1s ease-in; }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;
-            text-decoration: none; position: relative; overflow: hidden;
-        }
-        .glass-card::before {
-            content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
-            z-index: -1; margin: -1px; border-radius: inherit; 
-            background: conic-gradient(from 180deg at 50% 50%, #2dd4bf 0deg, #38bdf8 120deg, #818cf8 240deg, #2dd4bf 360deg);
-            opacity: 0; transition: opacity 0.4s ease;
-        }
-        .glass-card:hover::before { opacity: 1; }
-        .glass-card-content { background: #0a0a0a; border-radius: calc(1rem - 1px); height: 100%; width: 100%; transition: background 0.2s ease; }
-        .glass-card:hover { transform: translateY(-8px); }
-        .glass-card:hover .glass-card-content { background: #111111; }
-
-        /* Status Ticker */
-        .status-ticker { font-family: 'Share Tech Mono', monospace; border-top: 1px solid #27272a; border-bottom: 1px solid #27272a; overflow: hidden; }
-        .ticker-item { display: inline-block; padding: 0.5rem 1.5rem; border-right: 1px solid #27272a;}
-        
-        /* Hidden Terminal */
-        #terminal {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 0; background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            z-index: 200; transition: height 0.3s ease-in-out; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-        #terminal-output { flex-grow: 1; padding: 1rem; overflow-y: auto; font-family: 'Share Tech Mono', monospace; }
-        #terminal-input-line { display: flex; padding: 0.5rem 1rem; border-top: 1px solid #333; }
-        #terminal-prompt { font-family: 'Share Tech Mono', monospace; background: transparent; border: none; outline: none; color: #e5e5e5; flex-grow: 1; }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
+<body class="p-4 sm:p-6 lg:p-8 flex items-center justify-center min-h-screen">
 
-    <!-- Welcome Screen -->
-    <div id="welcome-screen">
-        <div class="text-left text-lg md:text-2xl">
-            <p id="line1" class="hidden">> INITIALIZING NEXUS HUB v1.0...</p>
-            <p id="line2" class="hidden">> AUTHENTICATING CONNECTION...</p>
-            <p id="line3" class="hidden text-teal-300">> CONNECTION SECURE.</p>
-            <p id="line4" class="hidden text-sky-300 font-bold">> WELCOME, LUMINARY.<span class="w-4 h-6 border-r-2 blinking-cursor"></span></p>
-        </div>
-    </div>
-    
-    <div id="main-content" class="w-full max-w-5xl mx-auto main-container">
-        <!-- Header -->
+    <div class="max-w-2xl mx-auto w-full">
         <header class="text-center mb-8">
-            <h1 id="main-title" class="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-sky-400 to-indigo-500 cursor-pointer">
-                Luminary Nexus
+            <h1 class="text-5xl md:text-6xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-sky-400 to-indigo-500">
+                The Nexus Hub
             </h1>
-            <p class="mt-4 text-xl text-neutral-400">Project Hub</p>
+            <p class="mt-4 text-lg text-neutral-400">Your portal to the Luminary Nexus DAO</p>
         </header>
 
-        <!-- Status Ticker -->
-        <div class="status-ticker w-full mb-12 md:mb-16">
-            <div id="ticker-content" class="whitespace-nowrap">
-                <!-- Ticker items will be injected by JS -->
+        <main class="glass-pane p-8 space-y-6">
+            <div id="wallet-connection">
+                <button id="connectButton" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-4 rounded-lg transition text-lg">
+                    Connect Wallet
+                </button>
+                <div id="wallet-info" class="hidden mt-6 text-center">
+                    <p class="text-neutral-400">Connected as:</p>
+                    <p id="wallet-address" class="font-mono text-lg text-sky-300 break-all"></p>
+                </div>
             </div>
-        </div>
 
-
-        <!-- Navigation Grid -->
-        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <a href="whitepaper.html" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-teal-900/50 border border-teal-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Whitepaper</h2><p class="text-neutral-400 flex-grow">Read the complete vision, mission, and technical details of the Luminary Nexus project.</p><div class="mt-6 font-semibold text-teal-400 flex items-center">Explore the Vision<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
-            <a href="questionnaire.html" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-sky-900/50 border border-sky-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Values Questionnaire</h2><p class="text-neutral-400 flex-grow">Take our values-alignment questionnaire to see if you're a fit for the community and for a potential LNX airdrop.</p><div class="mt-6 font-semibold text-sky-400 flex items-center">Check Your Alignment<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
-            <a href="communitystructure.html" class="glass-card group"><div class="glass-card-content p-8 flex flex-col items-start text-left"><div class="p-3 bg-indigo-900/50 border border-indigo-700 rounded-xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg></div><h2 class="text-2xl font-bold text-neutral-100 mb-2">Architectural Blueprint</h2><p class="text-neutral-400 flex-grow">Explore the physical design, concentric ring layout, and sustainable construction philosophy of our community.</p><div class="mt-6 font-semibold text-indigo-400 flex items-center">View the Structure<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></div></div></a>
+            <div id="data-display" class="hidden space-y-4 pt-6 border-t border-neutral-700">
+                <div class="flex justify-between items-center">
+                    <p class="text-xl text-neutral-300">LNX Balance:</p>
+                    <p id="lnx-balance" class="font-mono text-2xl text-teal-400">---</p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <p class="text-xl text-neutral-300">Voting Power:</p>
+                    <p id="voting-power" class="font-mono text-2xl text-indigo-400">---</p>
+                </div>
+            </div>
         </main>
 
-        <!-- Footer -->
-        <footer class="text-center mt-12 md:mt-16">
-            <div class="flex justify-center space-x-6">
-                <a href="https://discord.com/invite/5fB5ScqgZB" class="text-neutral-500 hover:text-white transition">Discord</a>
-                <a href="https://t.me/+WLV3Xb9oTcE1NTUx" class="text-neutral-500 hover:text-white transition">Telegram</a>
-                <a href="https://github.com/UtopianCreations/LuminaryNexusToken" class="text-neutral-500 hover:text-white transition">GitHub</a>
-            </div>
+        <footer class="text-center mt-8">
+            <p id="network-status" class="text-neutral-500 font-mono">Status: Not Connected</p>
         </footer>
     </div>
 
-    <!-- Hidden Terminal -->
-    <div id="terminal">
-        <div id="terminal-output"></div>
-        <div id="terminal-input-line">
-            <span class="text-teal-400">LNX-HUB:></span>
-            <input type="text" id="terminal-prompt" autofocus autocomplete="off">
-        </div>
-    </div>
-
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Welcome Screen Logic ---
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const mainContent = document.getElementById('main-content');
-            const lines = [document.getElementById('line1'), document.getElementById('line2'), document.getElementById('line3'), document.getElementById('line4')];
-            const delays = [500, 2000, 2000, 2000];
-            let cumulativeDelay = 0;
-
-            lines.forEach((line, index) => {
-                cumulativeDelay += delays[index];
-                setTimeout(() => {
-                    line.classList.add('typing-effect');
-                    line.classList.remove('hidden');
-                }, cumulativeDelay);
-            });
-
-            setTimeout(() => {
-                welcomeScreen.style.opacity = '0';
-                welcomeScreen.addEventListener('transitionend', () => welcomeScreen.style.display = 'none');
-                document.body.style.overflow = 'auto';
-                mainContent.style.opacity = '1';
-            }, cumulativeDelay + 2000);
-
-            // --- Interactive Background Logic ---
-            const container = document.querySelector('.main-container');
-            container.addEventListener('mousemove', e => {
-                const rect = container.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                container.style.setProperty('--mouse-x', `${x}px`);
-                container.style.setProperty('--mouse-y', `${y}px`);
-            });
-
-            // --- Status Ticker Logic ---
-            const tickerContent = document.getElementById('ticker-content');
-            const tickerItems = [
-                { label: 'SYSTEM STATUS', value: 'NOMINAL', color: 'text-green-400' },
-                { label: 'DAO TREASURY', value: '942,500,000 LNX', color: 'text-sky-400' },
-                { label: 'ACTIVE BOUNTIES', value: '17', color: 'text-yellow-400' },
-                { label: 'ETHICS BOARD', value: 'ONLINE', color: 'text-green-400' },
-                { label: 'LAST DAO VOTE', value: 'PASSED (91% MAJORITY)', color: 'text-teal-400' },
-                { label: 'COMMUNITY MEMBERS', value: '42', color: 'text-indigo-400' }
-            ];
-            
-            // Duplicate items to ensure smooth looping
-            const allItems = [...tickerItems, ...tickerItems];
-            tickerContent.innerHTML = allItems.map(item => `<div class="ticker-item"><span class="text-neutral-500">${item.label}:</span> <span class="${item.color}">${item.value}</span></div>`).join('');
-            
-            let scrollX = 0;
-            function animateTicker() {
-                scrollX -= 1;
-                const firstItemWidth = tickerContent.children[0].offsetWidth;
-                if (scrollX <= -firstItemWidth) {
-                    scrollX += firstItemWidth;
-                    tickerContent.appendChild(tickerContent.children[0]);
-                }
-                tickerContent.style.transform = `translateX(${scrollX}px)`;
-                requestAnimationFrame(animateTicker);
-            }
-            animateTicker();
-
-            // --- Terminal Logic ---
-            const terminal = document.getElementById('terminal');
-            const title = document.getElementById('main-title');
-            const terminalOutput = document.getElementById('terminal-output');
-            const terminalPrompt = document.getElementById('terminal-prompt');
-
-            title.addEventListener('click', () => {
-                if (terminal.style.height === '50%') {
-                    terminal.style.height = '0';
-                } else {
-                    terminal.style.height = '50%';
-                    terminalPrompt.focus();
-                    printToTerminal("Luminary Nexus Terminal v0.1. Type 'help' for a list of commands.");
-                }
-            });
-
-            terminalPrompt.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    const command = terminalPrompt.value.trim().toLowerCase();
-                    printToTerminal(`> ${command}`);
-                    handleCommand(command);
-                    terminalPrompt.value = '';
-                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                }
-            });
-
-            function printToTerminal(text) {
-                const p = document.createElement('p');
-                p.innerHTML = text.replace(/ /g, '&nbsp;'); // Preserve spacing
-                terminalOutput.appendChild(p);
-            }
-
-            function handleCommand(cmd) {
-                switch(cmd) {
-                    case 'help':
-                        printToTerminal("Available commands:");
-                        printToTerminal("<span class='text-teal-400'>help</span>           - Show this list");
-                        printToTerminal("<span class='text-teal-400'>status</span>         - Display project status");
-                        printToTerminal("<span class='text-teal-400'>values</span>         - List core community values");
-                        printToTerminal("<span class='text-teal-400'>clear</span>          - Clear terminal screen");
-                        printToTerminal("<span class='text-teal-400'>exit</span>           - Close terminal");
-                        break;
-                    case 'status':
-                        printToTerminal("Project Status: <span class='text-green-400'>Phase 1 - Blueprint & Foundation</span>");
-                        printToTerminal("Next Milestone: Values-Aligned Airdrop");
-                        break;
-                    case 'values':
-                        printToTerminal("Core Values: Radical Acceptance, Collaboration, Sustainability, Ethical Tech, Personal Growth, Peace, Transparency, Equity, Future-Oriented, AI Inclusion, Open Exploration, Complete Wellness.");
-                        break;
-                    case 'clear':
-                        terminalOutput.innerHTML = '';
-                        break;
-                    case 'exit':
-                        terminal.style.height = '0';
-                        break;
-                    default:
-                        printToTerminal(`Command not found: ${cmd}. Type 'help' for a list of commands.`);
-                }
-            }
-        });
-    </script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
