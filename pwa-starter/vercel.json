@@ -1,0 +1,22 @@
+{
+  "buildCommand": "",
+  "devCommand": "",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "framework": null,
+  "installCommand": "",
+  "name": "luminary-nexus-pwa",
+  "outputDirectory": "public",
+  "routes": [
+    {
+      "dest": "/icons/$1",
+      "src": "/icons/(.*)"
+    },
+    {
+      "dest": "/$1",
+      "src": "/(.*)"
+    }
+  ],
+  "version": 2
+}

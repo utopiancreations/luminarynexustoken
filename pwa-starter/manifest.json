@@ -1,0 +1,27 @@
+{
+  "name": "Luminary Nexus Hub",
+  "short_name": "Luminary",
+  "description": "A decentralized community hub founded on Radical Acceptance, Restorative Justice, and the Luminary Principle. Governance via quadratic voting and reputation systems.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#58a6ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "productivity", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr"
+}
